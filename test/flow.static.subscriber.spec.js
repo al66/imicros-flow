@@ -44,13 +44,13 @@ const Action3 = {
 }
 const subscriptions = [
     {
-        id: "step.one",
+        id: "step.one"  + timestamp ,
         event: "test.emit",
         params: { id: "meta.user.id", timestamp: Date.now() },
         action: "action.1.call"
     },    
     {
-        id: "step.two",
+        id: "step.two" + timestamp ,
         event: "test.*",
         params: { id: "meta.user.id", timestamp: Date.now() },
         action: "action.2.call",
@@ -126,7 +126,7 @@ describe("Test subscriber service", () => {
                 await new Promise((resolve, reject) => {
                   setTimeout(() => {
                     resolve()
-                  }, 100)
+                  }, 500)
                 })
                 expect(flow.length).toEqual(3);
             });
@@ -145,7 +145,7 @@ describe("Test subscriber service", () => {
                 await new Promise((resolve, reject) => {
                   setTimeout(() => {
                     resolve()
-                  }, 100)
+                  }, 500)
                 })
                 expect(flow.length).toEqual(2);
             });

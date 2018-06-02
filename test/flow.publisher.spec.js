@@ -1,11 +1,12 @@
 "use strict";
 const { ServiceBroker } = require("moleculer");
 const proxyquire = require('proxyquire');
+const { Publisher } = require("../index");
 
 //TODO: mock kafkajs for unit test
-var mockKafkajs = {
-};
-const Publisher = proxyquire("../lib/flow.publisher", { kafkajs: mockKafkajs });
+//var mockKafkajs = {
+//};
+//const Publisher = proxyquire("../lib/flow.publisher", { kafkajs: mockKafkajs });
 
 const timestamp = Date.now();
 
