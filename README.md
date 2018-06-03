@@ -80,7 +80,7 @@ run();
 
 ```
 
-# Usage Static Subscriber for Chaining
+## Usage Static Subscriber for Chaining
 ```js
 broker.createService(StaticSubscriber, Object.assign({ 
     settings: { 
@@ -106,12 +106,12 @@ broker.createService(StaticSubscriber, Object.assign({
 }));
 
 ```
-# Options
-## params
+## Options
+### params
 - w/o this option the action is called with _params_ = _payload_ of the event
 - otherwise it is called with the given value
 Parameters can be mapped by a valid path for the _payload_ of the event or the _meta_ data of the event.
-## payload
+### payload
 - w/o this option the termination event is called with _payload_ = _result_ of the action
 - otherwise it is emitted with the given value
 Payload can be mapped by a valid path for the _result_ of the called action or the _meta_ data of the event.
