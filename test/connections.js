@@ -1,9 +1,9 @@
 "use strict";
-const { Kafka, logLevel } = require("kafkajs");
+const { Kafka } = require("kafkajs");
 
 const PERFORMANCE_TEST = true;
 
-const serviceLogger = kafkalogLevel => ({ namespace, level, label, log }) => {
+const serviceLogger = () => ({ label, log }) => {
     if (!PERFORMANCE_TEST) console.log(label + " namespace:" + log.message, log);
 };
 
@@ -26,8 +26,8 @@ const producer = kafka.producer();
 let receipts = 0;
 let emits = 0;
 const eachEvent = () => {
-    return async ({ topic, partition, message }) => {
-        let event, offset;
+    return async ({ topic, message }) => {
+        let offset;
         try {
             offset = message.offset.toString();
             let content = JSON.parse(message.value.toString());
@@ -77,7 +77,7 @@ const run = async () => {
             "time (ms)": te-ts
         });
     }
-    await new Promise((resolve, reject) => {
+    await new Promise((resolve) => {
         setTimeout(() => {
             resolve();
         }, 1000);
@@ -92,7 +92,7 @@ const run = async () => {
     }
     await Promise.all(consumers.map(c => c.disconnect()));
     await producer.disconnect();
-    await new Promise((resolve, reject) => {
+    await new Promise((resolve) => {
         setTimeout(() => {
             resolve();
         }, 1000);

@@ -1,12 +1,13 @@
 {
   "name": "imicros-flow",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
   "description": "Moleculer service for loose coupled event handling",
   "main": "index.js",
   "scripts": {
     "lint": "eslint . --ext .js,.jsx",
+    "test-cover": "jest --coverage --no-cache",
     "test": "jest --no-cache",
     "test-publisher": "jest test/flow.publisher.spec.js --no-cache",
     "test-static-subscriber": "jest test/flow.static.subscriber.spec.js --no-cache --verbose",
@@ -15,7 +16,9 @@
   "jest": {
     "collectCoverageFrom": [
       "lib/*.js",
-      "!lib/globals.js"
+      "lib/util/*.js",
+      "!lib/globals.js",
+      "!lib/flow.publisher.kafkajs.js"
     ]
   },
   "repository": {
@@ -29,13 +32,9 @@
   "devDependencies": {
     "eslint": "^4.19.1",
     "jest": "^22.4.3",
-    "js-beautify": "^1.7.5",
-    "moleculer": "^0.12.3",
-    "proxyquire": "^2.0.1",
-    "rewiremock": "^3.7.2"
+    "moleculer": "^0.12.3"
   },
   "dependencies": {
-    "jsonwebtoken": "^8.2.1",
     "kafka-node": "^2.6.1",
     "kafkajs": "^1.0.1",
     "uuidv4": "^1.0.0"
