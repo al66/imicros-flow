@@ -1,6 +1,7 @@
 "use strict";
+const mock = require("kafkajs").Kafka;
+
 const { ServiceBroker } = require("moleculer");
-const Publisher = require("../lib/flow.publisher");
 const Subscriber = require("../lib/flow.static.subscriber");
 
 const timestamp = Date.now();
@@ -9,39 +10,57 @@ const Action1 = {
     name: "action.1",
     actions: {
         call: {
-            async handler(ctx) {
-                let result = { service: this.name, meta: ctx.meta, params: ctx.params }
+            handler(ctx) {
+                let result = { service: this.name, meta: ctx.meta, params: ctx.params };
+                this.logger.info(this.name + " called", result);
                 flow.push(result);
                 return result;
             }
         }
     }
-}
+};
 const Action2 = {
     name: "action.2",
     actions: {
         call: {
-            async handler(ctx) {
-                let result = { service: this.name, meta: ctx.meta, params: ctx.params }
+            handler(ctx) {
+                let result = { service: this.name, meta: ctx.meta, params: ctx.params };
+                this.logger.info(this.name + " called", result);
                 flow.push(result);
                 return result;
             }
         }
     }
-}
+};
 const Action3 = {
     name: "action.3",
     actions: {
         call: {
-            async handler(ctx) {
-                let result = { service: this.name, meta: ctx.meta, params: ctx.params }
+            handler(ctx) {
+                let result = { service: this.name, meta: ctx.meta, params: ctx.params };
+                this.logger.info(this.name + " called", result);
                 flow.push(result);
-                console.log("Called:", result)
                 return result;
             }
         }
     }
-}
+};
+const Publisher = {
+    name: "flow.publisher",
+    actions: {
+        emit: {
+            handler(ctx) {
+                let content = { 
+                    meta: ctx.meta, 
+                    event: ctx.params.event,
+                    payload: ctx.params.payload,
+                };
+                mock.__emit("events", 10, content);
+                return { success: "event stored", content: content };
+            }
+        }
+    }
+};
 const subscriptions = [
     {
         id: "step.one"  + timestamp ,
@@ -61,22 +80,16 @@ const subscriptions = [
         params: { id: "meta.user.id", timestamp: Date.now() },
         action: "action.3.call"
     }    
-]
+];
 let broker  = new ServiceBroker({
     logger: console,
-    logLevel: "debug" //"debug"
+    logLevel: "info" //"debug"
 });
 
 describe("Test subscriber service", () => {
 
-    let service, params, opts;
+    let service;
     beforeAll(() => {
-        broker.createService(Action1);
-        broker.createService(Action2);
-        broker.createService(Action3);
-        broker.createService(Publisher, Object.assign({ settings: { brokers: ['192.168.2.124:9092'] } }));
-        service = broker.createService(Subscriber, Object.assign({ settings: { brokers: ['192.168.2.124:9092'], subscriptions: subscriptions } }));
-        return broker.start();
     });
 
     afterAll( async () => {
@@ -84,71 +97,61 @@ describe("Test subscriber service", () => {
             
             await broker.stop();
 
-            await new Promise((resolve, reject) => {
-              setTimeout(() => {
-                resolve()
-              }, 100)
-            })
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, 100);
+            });
             
         } catch (err) {
-            consule.log(err)
-            // check for open handles
-            console.log(process._getActiveRequests());
-            console.log(process._getActiveHandles());
+            console.log(err);
         }
     });
     
 
     describe("Test create service", () => {
 
-        it("it should be created", () => {
-			expect(service).toBeDefined();
-		});
+        let createServices = () => {
+            broker.createService(Action1);
+            broker.createService(Action2);
+            broker.createService(Action3);
+            broker.createService(Publisher);
+            service = broker.createService(Subscriber, Object.assign({ settings: { brokers: ["192.168.2.124:9092"], subscriptions: subscriptions } }));
+        };
+        it("it should be created and started", async () => {
+            await createServices();
+            await broker.start();  
+            expect(service).toBeDefined();
+        });
+        
     });
 
     describe("Test subscriptions w/o owner", () => {
 
+        let opts;
         beforeEach(() => {
             flow = [];
-            opts = { meta: { user: { id: `1-${timestamp}` , email: `1-${timestamp}@host.com` }, groupId: `g-${timestamp}`, access: [`g-${timestamp}`] } }
-        })
+            opts = { meta: { user: { id: `1-${timestamp}` , email: `1-${timestamp}@host.com` }, groupId: `g-${timestamp}`, access: [`g-${timestamp}`] } };
+        });
 
-        it("'test.emit' should be received by both subscriptions ", () => {
-            let params = {
+        it("'test.emit' should be received by both subscriptions ", async () => {
+            let content = { 
+                meta: opts.meta, 
                 event: "test.emit",
-                payload: { msg: "say hello to the world" }
-			};
-            return broker.call("flow.publisher.emit", params, opts).then(async res => {
-                expect(res.success).toBeDefined();
-                expect(res.content).toEqual(expect.objectContaining(params))
-                expect(res.content.meta).toBeDefined();
-                // wait some ticks...
-                await new Promise((resolve, reject) => {
-                  setTimeout(() => {
-                    resolve()
-                  }, 500)
-                })
-                expect(flow.length).toEqual(3);
-            });
+                payload: { msg: "say hello to the world" },
+            };
+            await mock.__emit("events", 10, content);
+            expect(flow.length).toEqual(3);
         });
         
-        it("it should emit an event for the subscription ", () => {
-            let params = {
+        it("it should emit an event for the subscription ", async () => {
+            let content = { 
+                meta: opts.meta, 
                 event: "test.other",
-                payload: { msg: "say hello to the world" }
-			};
-            return broker.call("flow.publisher.emit", params, opts).then(async (res) => {
-                expect(res.success).toBeDefined();
-                expect(res.content).toEqual(expect.objectContaining(params))
-                expect(res.content.meta).toBeDefined();
-                // wait some ticks...
-                await new Promise((resolve, reject) => {
-                  setTimeout(() => {
-                    resolve()
-                  }, 500)
-                })
-                expect(flow.length).toEqual(2);
-            });
+                payload: { msg: "say hello to the world" },
+            };
+            await mock.__emit("events", 10, content);
+            expect(flow.length).toEqual(2);
         });
 
     });

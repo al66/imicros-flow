@@ -11,12 +11,12 @@ module.exports = {
     "extends": "eslint:recommended",
     "parserOptions": {
         "sourceType": "module",
-        "ecmaVersion": 6
+        "ecmaVersion": 8
     },
     "rules": {
         "indent": [
             "warn",
-            "tab",
+            4,
             { "SwitchCase": 1 }
         ],
         "quotes": [
@@ -34,7 +34,8 @@ module.exports = {
             "off"
         ],
         "no-unused-vars": [
-            "warn"
+            "warn",
+            { "varsIgnorePattern": "[iI]gnored" }
         ],
         "no-mixed-spaces-and-tabs": [
             "warn"

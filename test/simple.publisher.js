@@ -12,7 +12,7 @@ let run = async () => {
     await broker.call("flow.publisher.emit", {
         event: "my.first.event",
         payload: { msg: "somthing useful" }
-    })
+    });
     await broker.stop();
-}
+};
 run();

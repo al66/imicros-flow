@@ -4,7 +4,6 @@
 "use strict";
 
 module.exports = {
-	Publisher: require("./lib/flow.publisher"),
-	StaticSubscriber: require("./lib/flow.static.subscriber"),
-	Subscriber: require("./lib/flow.subscriber")
+    Publisher: require("./lib/flow.publisher"),
+    StaticSubscriber: require("./lib/flow.static.subscriber"),
 };

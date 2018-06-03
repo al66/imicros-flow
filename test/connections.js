@@ -1,28 +1,30 @@
-const { Kafka, logLevel } = require('kafkajs')
+"use strict";
+const { Kafka, logLevel } = require("kafkajs");
 
-const PERFORMANCE_TEST = true
+const PERFORMANCE_TEST = true;
 
 const serviceLogger = kafkalogLevel => ({ namespace, level, label, log }) => {
-    if (!PERFORMANCE_TEST) console.log(label + " namespace:" + log.message, log)
-}
+    if (!PERFORMANCE_TEST) console.log(label + " namespace:" + log.message, log);
+};
 
 // Create the client with the broker list
 const kafka = new Kafka({
-  clientId: "test",
-  brokers: ['192.168.2.124:9092'],
-  logLevel: 5,
-  logCreator: serviceLogger
-})
+    clientId: "test",
+    brokers: ["192.168.2.124:9092"],
+    logLevel: 5,
+    logCreator: serviceLogger
+});
 
 
 const consumers = [
-  kafka.consumer({ groupId: 'g1' + Date.now() }),
-  kafka.consumer({ groupId: 'g2' + Date.now() }),
-  kafka.consumer({ groupId: 'g3' + Date.now() })
-]
-const producer = kafka.producer()
+    kafka.consumer({ groupId: "g1" + Date.now() }),
+    kafka.consumer({ groupId: "g2" + Date.now() }),
+    kafka.consumer({ groupId: "g3" + Date.now() })
+];
+const producer = kafka.producer();
 
-var receipts = 0;
+let receipts = 0;
+let emits = 0;
 const eachEvent = () => {
     return async ({ topic, partition, message }) => {
         let event, offset;
@@ -32,14 +34,14 @@ const eachEvent = () => {
             receipts++;
             if (!PERFORMANCE_TEST) {
                 console.log(`Event topic ${topic} offset ${offset} received`, {
-                        value: content
-                    })
+                    value: content
+                });
             }
         } catch(e) {
-            console.log(e)
+            console.log(e);
         }
-    }
-}
+    };
+};
 
 let n = PERFORMANCE_TEST ? 1000 : 1;
 let emit = async () => {
@@ -49,20 +51,21 @@ let emit = async () => {
             messages: [
                 { value: JSON.stringify({ number: i }) }
             ],
-        })
+        });
+        emits++;
     }
-}
+};
 
 const run = async () => {
     await Promise.all(consumers.map( async(c) => {
         await c.connect();
-        await c.subscribe({ topic: "events", fromBeginning: false })
+        await c.subscribe({ topic: "events", fromBeginning: false });
         //await c.subscribe({ topic: "events" })
         await c.run({
-                    eachMessage: eachEvent(),
-                })
-    }))
-    await producer.connect()
+            eachMessage: eachEvent(),
+        });
+    }));
+    await producer.connect();
 
     let ts = Date.now();
     await emit();
@@ -70,27 +73,35 @@ const run = async () => {
     if (PERFORMANCE_TEST) {
         console.log({
             "receipts": receipts,
+            "emits": emits,
             "time (ms)": te-ts
-        })
+        });
     }
     await new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve()
-      }, 1000)
-    })
-
-    await Promise.all(consumers.map(c => c.disconnect()))
+        setTimeout(() => {
+            resolve();
+        }, 1000);
+    });
+    if (PERFORMANCE_TEST) {
+        console.log({
+            "final": {
+                "receipts": receipts,
+                "emits": emits,
+            }
+        });
+    }
+    await Promise.all(consumers.map(c => c.disconnect()));
     await producer.disconnect();
     await new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve()
-      }, 1000)
-    })
+        setTimeout(() => {
+            resolve();
+        }, 1000);
+    });
     if (!PERFORMANCE_TEST) {
         // check for open handles
         console.log(process._getActiveRequests());
         console.log(process._getActiveHandles());
     }
-} 
-run()
+}; 
+run();
 
