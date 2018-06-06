@@ -1,6 +1,6 @@
 {
   "name": "imicros-flow",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
   "description": "Moleculer service for loose coupled event handling",
