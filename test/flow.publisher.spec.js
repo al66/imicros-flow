@@ -3,7 +3,8 @@
 
 const { ServiceBroker } = require("moleculer");
 const { Publisher } = require("../index");
-const { FlowPublishFailedAuthorization } = require("../lib/util/errors");
+const { FlowPublishFailedAuthorization, FlowPublishLostConnection } = require("../lib/util/errors");
+const { producers, clients} = require("kafka-node");
 
 const timestamp = Date.now();
 
@@ -13,7 +14,7 @@ describe("Test publisher service", () => {
     beforeAll(() => {
         broker = new ServiceBroker({
             logger: console,
-            logLevel: "info" //"debug"
+            logLevel: "debug" //"debug"
         });
         service = broker.createService(Publisher, Object.assign({ settings: { brokers: ["localhost:9092"] } }));
         return broker.start();
@@ -27,6 +28,7 @@ describe("Test publisher service", () => {
 
         it("it should be created", () => {
             expect(service).toBeDefined();
+            expect(producers.length).toBe(1);
         });
     });
 
@@ -71,6 +73,54 @@ describe("Test publisher service", () => {
                 expect(res.content).toEqual(expect.objectContaining(params));
                 expect(res.content.meta).toBeDefined();
                 expect(res.content.owner).toBe(`g1-${timestamp}`);
+            });
+        });
+        
+        it("it should throw an error", async () => {
+            let params = {
+                event: "test.other",
+                payload: { msg: "say hello to the world" }
+            };
+            producers[0].fail = true;
+            await broker.call("flow.publisher.emit", params, opts).catch(err => {
+                expect(err instanceof Error).toBe(true);
+                expect(err.message).toBe("send failed");
+            });
+            producers[0].fail = false;
+        });
+    });
+
+    describe("Test kafka errors ", () => {
+
+        beforeEach(async () => {
+        });
+        
+        afterEach(async () => {
+            await broker.stop();
+            await broker.start();
+        });
+        
+        it("it should throw FlowPublishLostConnection", async () => {
+            let params = {
+                event: "test.other",
+                payload: { msg: "say hello to the world" }
+            };
+            await producers[0].emit("error");
+            await broker.call("flow.publisher.emit", params, opts).catch(err => {
+                expect(err instanceof FlowPublishLostConnection).toBe(true);
+                expect(err.message).toBe("any error");
+            });
+        });
+        
+        it("it should throw FlowPublishLostConnection", async () => {
+            let params = {
+                event: "test.other",
+                payload: { msg: "say hello to the world" }
+            };
+            await clients[0].emit("error");
+            await broker.call("flow.publisher.emit", params, opts).catch(err => {
+                expect(err instanceof FlowPublishLostConnection).toBe(true);
+                expect(err.message).toBe("any error");
             });
         });
         

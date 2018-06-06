@@ -5,7 +5,14 @@ const { ServiceBroker } = require("moleculer");
 const Subscriber = require("../lib/flow.static.subscriber");
 
 const timestamp = Date.now();
-let flow = [];
+let flow = {
+    "action.1": [],
+    "action.2": [],
+    "action.3": [],
+    "action.4": [],
+    "action.5": [],
+    "action.fail": []
+};
 const Action1 = {
     name: "action.1",
     actions: {
@@ -13,7 +20,7 @@ const Action1 = {
             handler(ctx) {
                 let result = { service: this.name, meta: ctx.meta, params: ctx.params };
                 this.logger.info(this.name + " called", result);
-                flow.push(result);
+                flow["action.1"].push(result);
                 return result;
             }
         }
@@ -26,7 +33,7 @@ const Action2 = {
             handler(ctx) {
                 let result = { service: this.name, meta: ctx.meta, params: ctx.params };
                 this.logger.info(this.name + " called", result);
-                flow.push(result);
+                flow["action.2"].push(result);
                 return result;
             }
         }
@@ -39,8 +46,46 @@ const Action3 = {
             handler(ctx) {
                 let result = { service: this.name, meta: ctx.meta, params: ctx.params };
                 this.logger.info(this.name + " called", result);
-                flow.push(result);
+                flow["action.3"].push(result);
                 return result;
+            }
+        }
+    }
+};
+const Action4 = {
+    name: "action.4",
+    actions: {
+        call: {
+            handler(ctx) {
+                let result = { service: this.name, meta: ctx.meta, params: ctx.params };
+                this.logger.info(this.name + " called", result);
+                flow["action.4"].push(result);
+                return result;
+            }
+        }
+    }
+};
+const Action5 = {
+    name: "action.5",
+    actions: {
+        call: {
+            handler(ctx) {
+                let result = { service: this.name, meta: ctx.meta, params: ctx.params };
+                this.logger.info(this.name + " called", result);
+                flow["action.5"].push(result);
+                return result;
+            }
+        }
+    }
+};
+const ActionFail = {
+    name: "action.fail",
+    actions: {
+        call: {
+            handler(ctx) {
+                let result = { service: this.name, meta: ctx.meta, params: ctx.params };
+                flow["action.fail"].push(result);
+                throw new Error("called action fail");
             }
         }
     }
@@ -79,11 +124,38 @@ const subscriptions = [
         event: "action.2.terminated",
         params: { id: "meta.user.id", timestamp: Date.now() },
         action: "action.3.call"
-    }    
+    },    
+    {
+        id: "unauthorized" + timestamp ,
+        access: [`g-other-${timestamp}`],
+        event: "test.*",
+        params: { id: "meta.user.id", timestamp: Date.now() },
+        action: "action.4.call"
+    },    
+    {
+        id: "authorized" + timestamp ,
+        access: [`g-${timestamp}`],
+        event: "test.*",
+        params: { id: "meta.user.id", timestamp: Date.now() },
+        action: "action.5.call"
+    },    
+    {
+        id: "fail" + timestamp ,
+        access: [`g-${timestamp}`],
+        event: "fail",
+        params: { id: "meta.user.id", timestamp: Date.now() },
+        action: "action.fail.call"
+    },        
+    {
+        id: "don't fail"  + timestamp ,
+        event: "fail",
+        params: { id: "meta.user.id", timestamp: Date.now() },
+        action: "action.1.call"
+    }
 ];
 let broker  = new ServiceBroker({
     logger: console,
-    logLevel: "info" //"debug"
+    logLevel: "debug" //"debug"
 });
 
 describe("Test subscriber service", () => {
@@ -115,6 +187,9 @@ describe("Test subscriber service", () => {
             broker.createService(Action1);
             broker.createService(Action2);
             broker.createService(Action3);
+            broker.createService(Action4);
+            broker.createService(Action5);
+            broker.createService(ActionFail);
             broker.createService(Publisher);
             service = broker.createService(Subscriber, Object.assign({ settings: { brokers: ["192.168.2.124:9092"], subscriptions: subscriptions } }));
         };
@@ -130,7 +205,14 @@ describe("Test subscriber service", () => {
 
         let opts;
         beforeEach(() => {
-            flow = [];
+            flow = {
+                "action.1": [],
+                "action.2": [],
+                "action.3": [],
+                "action.4": [],
+                "action.5": [],
+                "action.fail": []
+            };
             opts = { meta: { user: { id: `1-${timestamp}` , email: `1-${timestamp}@host.com` }, groupId: `g-${timestamp}`, access: [`g-${timestamp}`] } };
         });
 
@@ -141,21 +223,36 @@ describe("Test subscriber service", () => {
                 payload: { msg: "say hello to the world" },
             };
             await mock.__emit("events", 10, content);
-            expect(flow.length).toEqual(3);
+            expect(flow["action.1"].length).toEqual(1);
+            expect(flow["action.2"].length).toEqual(1);
+            expect(flow["action.3"].length).toEqual(1);
+            expect(flow["action.4"].length).toEqual(1);
+            expect(flow["action.5"].length).toEqual(1);
         });
         
-        it("it should emit an event for the subscription ", async () => {
-            let content = { 
-                meta: opts.meta, 
-                event: "test.other",
-                payload: { msg: "say hello to the world" },
-            };
-            await mock.__emit("events", 10, content);
-            expect(flow.length).toEqual(2);
-        });
-
     });
     
+    describe("Test subscriptions failed action", () => {
+
+        let opts;
+        beforeEach(() => {
+            opts = { meta: { user: { id: `1-${timestamp}` , email: `1-${timestamp}@host.com` }, groupId: `g-${timestamp}`, access: [`g-${timestamp}`] } };
+        });
+
+        it("it should consume the event with the failed action again ", async () => {
+            let content = { 
+                meta: opts.meta,
+                owner: `g-${timestamp}`,
+                event: "fail",
+                payload: { msg: "say hello to the world" },
+            };
+            let result = await mock.__emit("events", 10, content);
+            expect(result.success).toEqual(6);
+            expect(result.failed).toEqual(1);
+        });
+
+        
+    });
     /*
     describe("Test subscriptions with owner", () => {
 

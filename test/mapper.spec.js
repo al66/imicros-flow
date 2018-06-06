@@ -2,6 +2,8 @@
 
 const mapper = require("../lib/util/mapper");
 
+class SomeError extends Error {}
+
 describe("Test Mapper", () => {
 
     it("it should be a function", () => {
@@ -23,6 +25,24 @@ describe("Test Mapper", () => {
     it("it should also work without any output", () => {
         let result = mapper(null, { test: "Hallo" }  );
         expect(result).toEqual(null);
+    });
+    
+    it("it should also work with output string (do nothing)", () => {
+        let result = mapper("Some Text", { test: "Hallo" }  );
+        expect(result).toEqual("Some Text");
+    });
+    
+    it("it should also work with output number (do nothing)", () => {
+        let result = mapper(5, { test: "Hallo" }  );
+        expect(result).toEqual(5);
+    });
+    
+    it("it should also work with standard objects w/o own properties", () => {
+        let error = new SomeError("Any");
+        error.substitute = "meta.user.id";
+        let result = mapper(error, { meta: { user: { id: "123456" } } }  );
+        expect(result instanceof SomeError).toEqual(true);
+        expect(result.substitute).toEqual("123456");
     });
     
     it("it shouldn't replace other texts or numbers", () => {

@@ -1,4 +1,7 @@
 # imicros-flow
+[![Build Status](https://travis-ci.org/al66/imicros-flow.svg?branch=master)](https://travis-ci.org/al66/imicros-flow)
+[![Coverage Status](https://coveralls.io/repos/github/al66/imicros-flow/badge.svg?branch=master)](https://coveralls.io/github/al66/imicros-flow?branch=master)
+
 [Moleculer](https://github.com/moleculerjs/moleculer) service for loose coupled event handling
 
 # Installation
