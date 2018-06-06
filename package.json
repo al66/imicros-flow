@@ -12,7 +12,6 @@
     "test-publisher": "jest test/flow.publisher.spec.js --no-cache",
     "test-static-subscriber": "jest test/flow.static.subscriber.spec.js --no-cache --verbose",
     "test-mapper": "jest test/mapper.spec.js --no-cache",
-    "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "jest": {
     "collectCoverageFrom": [
