@@ -7,8 +7,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint . --ext .js,.jsx",
-    "test-cover": "jest --coverage --no-cache",
-    "test": "jest --no-cache",
+    "test": "jest --coverage --no-cache",
     "test-publisher": "jest test/flow.publisher.spec.js --no-cache",
     "test-static-subscriber": "jest test/flow.static.subscriber.spec.js --no-cache --verbose",
     "test-mapper": "jest test/mapper.spec.js --no-cache"
