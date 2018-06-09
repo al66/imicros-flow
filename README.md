@@ -6,14 +6,15 @@
 
 Ready to use as docker instance as described under section **Docker**
 
-# Installation
+## Installation
 ```
 $ npm install imicros-flow --save
 ```
-# Dependencies
+## Dependencies
 Requires a running [Kafka](https://kafka.apache.org/) broker.
 
-# Usage Publisher
+# Usage
+## Usage Publisher
 ```js
 const { ServiceBroker } = require("moleculer");
 const { Publisher } = require("imicros-flow");
@@ -33,7 +34,7 @@ let run = async () => {
 run();
 
 ```
-# Usage Static Subscriber
+## Usage Static Subscriber
 ```js
 const { ServiceBroker } = require("moleculer");
 const { Publisher, StaticSubscriber } = require("imicros-flow");
@@ -85,7 +86,7 @@ run();
 
 ```
 
-## Usage Static Subscriber for Chaining
+### Usage Static Subscriber for Chaining
 ```js
 broker.createService(StaticSubscriber, Object.assign({ 
     settings: { 
@@ -111,33 +112,34 @@ broker.createService(StaticSubscriber, Object.assign({
 }));
 
 ```
-## Publisher Options
-### broker
+## Options
+### Publisher Options
+#### broker
 - array of kafka broker
-- refer to description for parameter kafkaHost of module [kafkajs](https://github.com/tulios/kafkajs)
+- refer to description for parameter kafkaHost of module [kafka-node](https://github.com/SOHU-Co/kafka-node)
 - but transferred as an array not a comma separated string!
-### ssl
+#### ssl
 - refer to description sslOptions of module [kafka-node](https://github.com/SOHU-Co/kafka-node)
-### connectionTimeout
+#### connectionTimeout
 - refer to description sessionTimeout of module [kafka-node](https://github.com/SOHU-Co/kafka-node)
-### topics.event
+#### topics.event
 - name of the events topic to be used (default `events`)
 
-## Subscriber Options
-### broker
+### Subscriber Options
+#### broker
 - array of kafka broker
 - refer to description of module [kafkajs](https://github.com/tulios/kafkajs)
-### ssl
+#### ssl
 - refer to description of module [kafkajs](https://github.com/tulios/kafkajs)
-### connectionTimeout
+#### connectionTimeout
 - refer to description of module [kafkajs](https://github.com/tulios/kafkajs)
-### retry
+#### retry
 - refer to description of module [kafkajs](https://github.com/tulios/kafkajs)
-### topics.event
+#### topics.event
 - name of the events topic to be used (default `events`)
 
-## Subscription Options
-### event
+### Subscription Options
+#### event
 - listen for this event
 - possible with wildcards e.g. 
   - `user.*` matches `user.created`, `user.confirmed` but not `user.changed.profile`
@@ -145,15 +147,15 @@ broker.createService(StaticSubscriber, Object.assign({
   - `*.log` matches `user.log` but not `user.changed.log`
   - `**.log` matches all events ending with `.log`
   - `user.*.log` matches all events like `user.created.log`, `user.changed.log` 
-### params
+#### params
 - w/o this option the action is called with _params_ = _payload_ of the event
 - otherwise it is called with the given value
 Parameters can be mapped by a valid path for the _payload_ of the event or the _meta_ data of the event.
-### action
+#### action
 - a given action will be called after receipts an event which matched the pattern
-### emit
+#### emit
 - a given event will be publish after successful call of the given action
-### payload
+#### payload
 - w/o this option the termination event is called with _payload_ = _result_ of the action
 - otherwise it is emitted with the given value
 Payload can be mapped by a valid path for the _result_ of the called action or the _meta_ data of the event.
