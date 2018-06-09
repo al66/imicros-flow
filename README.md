@@ -119,4 +119,105 @@ Parameters can be mapped by a valid path for the _payload_ of the event or the _
 - otherwise it is emitted with the given value
 Payload can be mapped by a valid path for the _result_ of the called action or the _meta_ data of the event.
 
+# Docker
+You can use the docker files in folder docker as a basis.
+Copy the files to your docker folder.
+The files have to be adopted to meet your environment as described beow.
+Then start the daemon with `docker-compose up -d`.
+## docker-compose.yml
+adopt the names of the externals_links (nats and kafka_kafka_1) and the names of the networks (redis_default, nats_default and kafka_default) to your docker settings. 
+You can fetch the names via command `docker container ls` and `docker network ls`
+```
+version: '2'
+services:
+
+    publisher:
+        build:
+            context: .
+        image: flow-publisher
+        # env_file: docker-compose.env
+        environment:
+            SERVICES: publisher
+        external_links:
+        # depends on the names of your running docker services for nats and kafka
+        - nats
+        -  kafka_kafka_1
+        # depends on the names of the networks of your running docker services
+        networks:
+        - default
+        - redis_default
+        - nats_default
+        - kafka_default
+
+    # for multible subscriber with different subscriptions add a sequence number per subscriber service
+    subscriber-1:
+        build:
+            context: .
+        image: flow-subscriber-1
+        # env_file: docker-compose.env
+        environment:
+            SERVICES: subscriber-1
+        external_links:
+        # depends on the names of your running docker services for nats and kafka
+        - nats
+        -  kafka_kafka_1
+        networks:
+        - default
+        # depends on the names of the networks of your running docker services
+        - redis_default
+        - nats_default
+        - kafka_default
+
+networks:
+    redis_default:
+        external: true
+    nats_default:
+        external: true
+    kafka_default:
+        external: true
+    
+```
+## moleculer.config.js
+adopt the hostname (nats) according to your containername:
+```
+    transporter: "nats://nats:4222",
+```
+if you want to use the cache also, the hostname must be adopted to:
+```
+    /*
+    cacher: {
+        type: "Redis",
+        options: {
+            redis: {
+                host: "192.168.2.124",
+                db: 1
+            }
+        }
+    },
+    */
+```
+## publisher.service.js
+adopt the hostname (kafka) according to your containername.
+```
+    brokers: ["kafka_kafka_1:9092"]
+```
+## subscriber-1.service.js
+adopt the hostname (kafka) according to your containername:
+```
+    brokers: ["kafka_kafka_1:9092"]
+```
+add your own subscriptions instead of the examples:
+```
+    subscriptions: [
+        {
+            id: "registration" ,                        // consumer group
+            //fromBeginning: 'earliest',                // if already events exists and consumer group should handle
+                                                        // them starting with the first existing
+            event: "user.created",                      // event listening for
+            action: "registration.requestConfirmation"  // action to be called
+        }
+    ]
+```
+
+
 
