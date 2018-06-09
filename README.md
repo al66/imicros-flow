@@ -4,6 +4,8 @@
 
 [Moleculer](https://github.com/moleculerjs/moleculer) service for loose coupled event handling
 
+Ready to use as docker instance as described under section **Docker**
+
 # Installation
 ```
 $ npm install imicros-flow --save
@@ -109,20 +111,57 @@ broker.createService(StaticSubscriber, Object.assign({
 }));
 
 ```
-## Options
+## Publisher Options
+### broker
+- array of kafka broker
+- refer to description for parameter kafkaHost of module [kafkajs](https://github.com/tulios/kafkajs)
+- but transferred as an array not a comma separated string!
+### ssl
+- refer to description sslOptions of module [kafka-node](https://github.com/SOHU-Co/kafka-node)
+### connectionTimeout
+- refer to description sessionTimeout of module [kafka-node](https://github.com/SOHU-Co/kafka-node)
+### topics.event
+- name of the events topic to be used (default `events`)
+
+## Subscriber Options
+### broker
+- array of kafka broker
+- refer to description of module [kafkajs](https://github.com/tulios/kafkajs)
+### ssl
+- refer to description of module [kafkajs](https://github.com/tulios/kafkajs)
+### connectionTimeout
+- refer to description of module [kafkajs](https://github.com/tulios/kafkajs)
+### retry
+- refer to description of module [kafkajs](https://github.com/tulios/kafkajs)
+### topics.event
+- name of the events topic to be used (default `events`)
+
+## Subscription Options
+### event
+- listen for this event
+- possible with wildcards e.g. 
+  - `user.*` matches `user.created`, `user.confirmed` but not `user.changed.profile`
+  - `user.**` matches all events starting with user. including `user.changed.profile`
+  - `*.log` matches `user.log` but not `user.changed.log`
+  - `**.log` matches all events ending with `.log`
+  - `user.*.log` matches all events like `user.created.log`, `user.changed.log` 
 ### params
 - w/o this option the action is called with _params_ = _payload_ of the event
 - otherwise it is called with the given value
 Parameters can be mapped by a valid path for the _payload_ of the event or the _meta_ data of the event.
+### action
+- a given action will be called after receipts an event which matched the pattern
+### emit
+- a given event will be publish after successful call of the given action
 ### payload
 - w/o this option the termination event is called with _payload_ = _result_ of the action
 - otherwise it is emitted with the given value
 Payload can be mapped by a valid path for the _result_ of the called action or the _meta_ data of the event.
 
 # Docker
-You can use the docker files in folder docker as a basis.
-Copy the files to your docker folder.
-The files have to be adopted to meet your environment as described beow.
+You can use the files in folder docker as a basis for your own configuration.
+Copy all files and the folder services to your docker folder.
+The files have to be adopted to meet your environment as described below.
 Then start the daemon with `docker-compose up -d`.
 ## docker-compose.yml
 adopt the names of the externals_links (nats and kafka_kafka_1) and the names of the networks (redis_default, nats_default and kafka_default) to your docker settings. 
@@ -196,12 +235,12 @@ if you want to use the cache also, the hostname must be adopted to:
     },
     */
 ```
-## publisher.service.js
+## services/publisher.service.js
 adopt the hostname (kafka) according to your containername.
 ```
     brokers: ["kafka_kafka_1:9092"]
 ```
-## subscriber-1.service.js
+## services/subscriber-1.service.js
 adopt the hostname (kafka) according to your containername:
 ```
     brokers: ["kafka_kafka_1:9092"]
