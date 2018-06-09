@@ -4,7 +4,7 @@
 
 [Moleculer](https://github.com/moleculerjs/moleculer) service for loose coupled event handling
 
-Ready to use as docker instance as described under section **Docker**
+Ready to use as docker instance as described under section [Docker](#Docker)
 
 ## Installation
 ```
