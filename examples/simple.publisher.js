@@ -3,7 +3,7 @@
 const { ServiceBroker } = require("moleculer");
 const { Publisher } = require("../index");
 
-let broker  = new ServiceBroker({ logger: console, logLevel: "debug" });
+let broker  = new ServiceBroker({ logger: console, logLevel: "info" });
 
 const Service = {
     name: "flow.publisher",

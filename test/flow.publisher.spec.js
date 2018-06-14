@@ -1,10 +1,11 @@
 "use strict";
+//const mock = require("kafkajs").Kafka;
+const { producers } = require("kafkajs");
 //jest.unmock("kafka-node");
 
 const { ServiceBroker } = require("moleculer");
 const { Publisher } = require("../index");
-const { FlowPublishFailedAuthorization, FlowPublishLostConnection } = require("../lib/util/errors");
-const { producers, clients} = require("kafka-node");
+const { FlowPublishFailedAuthorization } = require("../lib/util/errors");
 
 const timestamp = Date.now();
 
@@ -75,6 +76,34 @@ describe("Test publisher service", () => {
                 expect(res.content.owner).toBe(`g1-${timestamp}`);
             });
         });
+
+        it("it should emit event with owner " + `1-${timestamp}`, () => {
+            opts = { meta: { user: { id: `1-${timestamp}` , email: `1-${timestamp}@host.com` }, access: [`g1-${timestamp}`] } };
+            let params = {
+                event: "test.emit",
+                payload: { msg: "say hello to the world" }
+            };
+            return broker.call("flow.publisher.emit", params, opts).then(res => {
+                expect(res.success).toBeDefined();
+                expect(res.content).toEqual(expect.objectContaining(params));
+                expect(res.content.meta).toBeDefined();
+                expect(res.content.owner).toBe(`1-${timestamp}`);
+            });
+        });
+        
+        it("it should emit event w/o owner", () => {
+            opts = { };
+            let params = {
+                event: "test.emit",
+                payload: { msg: "say hello to the world" }
+            };
+            return broker.call("flow.publisher.emit", params, opts).then(res => {
+                expect(res.success).toBeDefined();
+                expect(res.content).toEqual(expect.objectContaining(params));
+                expect(res.content.meta).toBeDefined();
+                expect(res.content.owner).toBeUndefined();
+            });
+        });
         
         it("it should throw an error", async () => {
             let params = {
@@ -84,12 +113,27 @@ describe("Test publisher service", () => {
             producers[0].fail = true;
             await broker.call("flow.publisher.emit", params, opts).catch(err => {
                 expect(err instanceof Error).toBe(true);
-                expect(err.message).toBe("send failed");
+                expect(err.message).toBe("simulated fail of producer.send");
             });
-            producers[0].fail = false;
         });
+        
+        it("it should emit event to topic 'another'", () => {
+            let params = {
+                topic: "another",
+                event: "test.emit",
+                payload: { msg: "say hello to the world" }
+            };
+            return broker.call("flow.publisher.emit", params, opts).then(res => {
+                expect(res.success).toBeDefined();
+                expect(res.content).toEqual(expect.objectContaining({event: params.event, payload: params.payload}));
+                expect(res.content.meta).toBeDefined();
+                expect(res.topic).toEqual("another");
+            });
+        });
+        
     });
 
+    /*
     describe("Test kafka errors ", () => {
 
         beforeEach(async () => {
@@ -125,4 +169,5 @@ describe("Test publisher service", () => {
         });
         
     });
+    */
 });

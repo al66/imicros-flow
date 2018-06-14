@@ -8,28 +8,54 @@ let broker  = new ServiceBroker({ logger: console, logLevel: "info" });
 
 broker.createService(Publisher, Object.assign({ settings: { brokers: ["192.168.2.124:9092"] } }));
 
+let timestamp = Date.now();
 broker.createService(StaticSubscriber, Object.assign({ 
     settings: { 
         brokers: ["192.168.2.124:9092"], 
         subscriptions: [
             {
-                id: "step.one" ,
-                //fromBeginning: 'earliest',
-                event: "my.first.event",
-                action: "action.any"
+                id: "step.one" + timestamp,
+                topic: "users",
+                event: "user.created",
+                params: { userId: "payload.user.id" },
+                action: "registration.requestConfirmationMail",
+                emit: {
+                    topic: "mailer",
+                    event: "request.sendMail",
+                    payload: { template: "result.template", mailTo: "meta.user.email" }
+                }
+            },
+            {
+                id: "step.two" + timestamp ,
+                topic: "mailer",
+                event: "request.sendMail",
+                action: "mailer.sendmail"       // will be called with params = payload
             }
         ]
     } 
 }));
 
 broker.createService({
-    name: "action",
+    name: "registration",
     actions: {
-        any: {
+        requestConfirmationMail: {
             async handler(ctx) {
-                let result = { service: this.name, meta: ctx.meta, params: ctx.params };
-                await this.logger.info("Service called:", result);
-                return;
+                let result = { template: "my-template", meta: ctx.meta, params: ctx.params };
+                await this.logger.info("Service called:" + this.name, result);
+                return result;
+            }
+        }
+    }
+});    
+
+broker.createService({
+    name: "mailer",
+    actions: {
+        sendmail: {
+            async handler(ctx) {
+                let result = { meta: ctx.meta, params: ctx.params };
+                await this.logger.info("Service called:" + this.name, result);
+                return result;
             }
         }
     }
@@ -38,14 +64,23 @@ broker.createService({
 let run = async () => {
     await broker.start();
     await broker.call("flow.publisher.emit", {
-        event: "my.first.event",
-        payload: { msg: "somthing useful" }
-    });
+        topic: "users",
+        event: "user.created",
+        payload: { user: { id: "123456789" } }
+    }, {
+        meta: {
+            user: {
+                email: "test@test.com"
+            }
+        }
+    })
+    .then(res => console.log(res))
+    .catch(err => console.error(err));
     // wait some time for consuming...
     await new Promise((resolve) => {
         setTimeout(() => {
             resolve();
-        }, 500);
+        }, 2000);
     });
     await broker.stop();
 };

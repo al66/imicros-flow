@@ -2,6 +2,7 @@
 const { logLevel } = require("kafkajs");
 
 let consumers = [];
+let producers = [];
 
 class Consumer {
     
@@ -28,6 +29,31 @@ class Consumer {
     
  }
 
+let emittedEvent;
+class Producer {
+    constructor () {
+        producers.push(this);
+        this.fail = false;
+    }
+
+    connect () {
+        
+    }
+    
+    send({ topic, messages }) {
+        emittedEvent = null;
+        if (this.fail) {
+            this.fail = false;
+            throw new Error("simulated fail of producer.send");
+        }
+        emittedEvent = { topic: topic, messages: messages };
+    }    
+    
+    disconnect () {
+        
+    }
+}
+
 class mockKafka {
 	
     constructor (options) {
@@ -41,6 +67,10 @@ class mockKafka {
             this.logger({ namespace: "KAFKA:", level: 4, log: { message: "log Level 4" }});
             this.logger({ namespace: "KAFKA:", level: 5, log: { message: "log Level 5" }});
         }
+    }
+    
+    static __resetConsumers () {
+        consumers = [];
     }
     
     static async __emit (topic, offset, payload) {
@@ -68,13 +98,27 @@ class mockKafka {
         return result;
     }
     
+    static __emittedEvent () {
+        return emittedEvent;
+    }
+    
+    static __emittedEventReset () {
+        emittedEvent = null;
+    }
+    
     consumer (options) {
         return new Consumer(options);
+    }
+
+    producer (options) {
+        return new Producer(options);
     }
 }
 
 
 module.exports = {
     Kafka: mockKafka,
-    logLevel: logLevel
+    logLevel: logLevel,
+    producers: producers,
+    consumers: consumers
 };

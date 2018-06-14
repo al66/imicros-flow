@@ -26,6 +26,7 @@ broker.createService(Publisher, Object.assign({ settings: { brokers: ['localhost
 let run = async () => {
     await broker.start();
     await broker.call("flow.publisher.emit", {
+        topic: "users",             // optional: default value from settings or 'events'
         event: "my.first.event",
         payload: { msg: "somthing useful" }
     })
@@ -93,39 +94,28 @@ broker.createService(StaticSubscriber, Object.assign({
         brokers: ["localhost:9092"], 
         subscriptions: [
             {
-                event: "my.first.event",
-                params: { text: "payload.msg" },
-                action: "action.any",
-                emit: "action.terminated",
-                payload: { origin: "my.first.event" }
+                topic: "users",
+                event: "user.created",
+                params: { userId: "payload.user.id" },
+                action: "registration.requestConfirmationMail",
+                emit: {
+                    topic: "mailer",
+                    event: "request.sendMail",
+                    payload: { template: "result.mailTemplate", mailTo: "meta.user.email" }
+                }
             },
             {
-                event: "action.terminated",
-                params: { comesFrom: "payload.msg" },
-                action: "action.another",                   // returns user.email
-                emit: "another.action.terminated",
-                payload: { goesTo: "result.user.email"}
+                topic: "mailer",
+                event: "request.sendMail",
+                action: "mailer.sendmail"       // will be called with params = payload
             }
-            // ...and so on
         ]
     } 
 }));
 
 ```
 ## Options
-### Publisher Options
-#### broker
-- array of kafka broker
-- refer to description for parameter kafkaHost of module [kafka-node](https://github.com/SOHU-Co/kafka-node)
-- but transferred as an array not a comma separated string!
-#### ssl
-- refer to description sslOptions of module [kafka-node](https://github.com/SOHU-Co/kafka-node)
-#### connectionTimeout
-- refer to description sessionTimeout of module [kafka-node](https://github.com/SOHU-Co/kafka-node)
-#### topics.event
-- name of the events topic to be used (default `events`)
-
-### Subscriber Options
+### General Publisher/Subscriber Options
 #### broker
 - array of kafka broker
 - refer to description of module [kafkajs](https://github.com/tulios/kafkajs)
@@ -136,7 +126,7 @@ broker.createService(StaticSubscriber, Object.assign({
 #### retry
 - refer to description of module [kafkajs](https://github.com/tulios/kafkajs)
 #### topics.event
-- name of the events topic to be used (default `events`)
+- name of the default topic to be used (default `events`)
 
 ### Subscription Options
 #### event
