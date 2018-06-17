@@ -129,6 +129,8 @@ broker.createService(StaticSubscriber, Object.assign({
 - name of the default topic to be used (default `events`)
 
 ### Subscription Options
+#### topic
+- subscribe messages for this topic
 #### event
 - listen for this event
 - possible with wildcards e.g. 
@@ -145,7 +147,11 @@ Parameters can be mapped by a valid path for the _payload_ of the event or the _
 - a given action will be called after receipts an event which matched the pattern
 #### emit
 - a given event will be publish after successful call of the given action
-#### payload
+##### emit.topic
+- the topic to which the subscription emits must be different to the topic, which it subscribes 
+##### emit.event
+- the event which the subscription emits 
+##### emit.payload
 - w/o this option the termination event is called with _payload_ = _result_ of the action
 - otherwise it is emitted with the given value
 Payload can be mapped by a valid path for the _result_ of the called action or the _meta_ data of the event.
