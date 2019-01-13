@@ -1,19 +1,13 @@
 language: node_js
 
-env:
-  global:
-  - ZOOKEEPER_PEERS=localhost:2181
-  - KAFKA_PEERS=localhost:9092
+services:
+- docker
 
 node_js:
   - stable
 
 before_install:
-- wget http://www.us.apache.org/dist/kafka/0.8.2.1/kafka_2.10-0.8.2.1.tgz -O kafka.tgz
-- mkdir -p kafka && tar xzf kafka.tgz -C kafka --strip-components 1
-- nohup bash -c "cd kafka && bin/zookeeper-server-start.sh config/zookeeper.properties &"
-- nohup bash -c "cd kafka && bin/kafka-server-start.sh config/server.properties &"
-- sleep 5
+- docker run -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=`docker-machine ip \`docker-machine active\`` --env ADVERTISED_PORT=9092 spotify/kafka   
 
 install:
   - npm install
