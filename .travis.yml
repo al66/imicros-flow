@@ -3,16 +3,21 @@ language: node_js
 services:
 - docker
 
+addons:
+  hosts:
+    - zookeeper
+    - kafka
+    
 node_js:
   - stable
 
 before_install:
 #- docker pull spotify/kafka 
 #- docker run -d -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=127.0.0.1 --env ADVERTISED_PORT=9092 spotify/kafka
-- docker pull wurstmeister/zookeeper
+- docker pull zookeeper
+- docker run -d --name zookeeper -p 2181:2181 zookeeper
 - docker pull wurstmeister/kafka
-- docker run -d -p 2181:2181 wurstmeister/zookeeper
-- docker run -d -e KAFKA_ADVERTISED_HOST_NAME=127.0.0.1  -e KAFKA_ADVERTISED_PORT=9092 -e KAFKA_ZOOKEEPER_CONNECT=127.0.0.1:2181  -e KAFKA_AUTO_CREATE_TOPICS_ENABLE=true -p 9092:9092 wurstmeister/kafka
+- docker run -d --name kafka --link zookeeper:zookeeper -e KAFKA_ADVERTISED_HOST_NAME=kafka  -e KAFKA_ADVERTISED_PORT=9092 -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181  -e KAFKA_AUTO_CREATE_TOPICS_ENABLE='true' -e KAFKA_CREATE_TOPICS='flow.events' -p 9092:9092 wurstmeister/kafka
 
 install:
   - npm install
