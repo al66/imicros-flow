@@ -20,13 +20,13 @@ const Action = {
 };
 
 const collection = [];
-for (let i=0; i< 10; i++) {
+for (let i=0; i< 1; i++) {
     let subscription = [];
     // 1  x 100 = 100k messages are consumed - ok -> runs about 1 minute w/o errors
     // 10 x 10 = 100k messages are consumed - ok -> runs about 1 minute w/o errors
     // 10 x 100 = 1m messages are consumed - works more or less, but not applicable on one instance  -> runs about 13 minutes w/o errors 
     // 10 x 1000 throws connection errors due to timeouts  
-    for (let n=0; n< 10; n++) {    
+    for (let n=0; n< 2; n++) {    
         let item = {
             id: "subscription " + i + "-" + n + " " + timestamp,
             topic: "users",

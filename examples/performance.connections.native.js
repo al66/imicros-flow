@@ -43,13 +43,13 @@ const eachEvent = () => {
     };
 };
 
-let n = PERFORMANCE_TEST ? 1000 : 1;
+let n = PERFORMANCE_TEST ? 4000 : 1;
 let emit = async () => {
     for (let i=0; i<n; i++) {
         await producer.send({
             topic: "events",
             messages: [
-                { value: JSON.stringify({ number: i }) }
+                { key: "tbd", value: JSON.stringify({ number: i }) }
             ],
         });
         emits++;
@@ -83,10 +83,12 @@ const run = async () => {
         }, 1000);
     });
     if (PERFORMANCE_TEST) {
+        te = Date.now();
         console.log({
             "final": {
                 "receipts": receipts,
                 "emits": emits,
+                "time (ms)": te-ts
             }
         });
     }
@@ -95,7 +97,7 @@ const run = async () => {
     await new Promise((resolve) => {
         setTimeout(() => {
             resolve();
-        }, 1000);
+        }, 10000);
     });
     if (!PERFORMANCE_TEST) {
         // check for open handles

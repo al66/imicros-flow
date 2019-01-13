@@ -27,6 +27,11 @@ describe("Test Mapper", () => {
         expect(result).toEqual(null);
     });
     
+    it("it should return unmidified input", () => {
+        let result = mapper(".", { test: "Hallo" }  );
+        expect(result).toEqual({ test: "Hallo" });
+    });
+    
     it("it should also work with output string (do nothing)", () => {
         let result = mapper("Some Text", { test: "Hallo" }  );
         expect(result).toEqual("Some Text");
