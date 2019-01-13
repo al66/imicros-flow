@@ -13,7 +13,7 @@
     "test-static-subscriber": "jest test/flow.static.subscriber.spec.js --no-cache --verbose",
     "test-db": "jest test/db.neo4j.spec.js --no-cache --config=local.js",
     "test-control": "jest test/flow.control.spec.js --no-cache --config=local.js",
-    "test-emitter": "jest test/flow.middleware.spec.js --no-cache --config=local.js",
+    "test-middleware": "jest test/flow.middleware.spec.js --no-cache --config=local.js",
     "test-store": "jest test/flow.store.spec.js --no-cache --config=local.js",
     "test-mapper": "jest test/mapper.spec.js --no-cache",
     "test-size": "jest test/size.spec.js --no-cache",
