@@ -17,7 +17,7 @@ before_install:
 - docker pull zookeeper
 - docker run -d --name zookeeper -p 2181:2181 zookeeper
 - docker pull wurstmeister/kafka
-- docker run -d --name kafka --link zookeeper:zookeeper -e KAFKA_ADVERTISED_HOST_NAME=kafka  -e KAFKA_ADVERTISED_PORT=9092 -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181  -e KAFKA_AUTO_CREATE_TOPICS_ENABLE=true -e KAFKA_CREATE_TOPICS='events' -p 9092:9092 wurstmeister/kafka
+- docker run -d --name kafka --link zookeeper:zookeeper -e KAFKA_ADVERTISED_HOST_NAME=kafka  -e KAFKA_ADVERTISED_PORT=9092 -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181  -e KAFKA_AUTO_CREATE_TOPICS_ENABLE=true -e KAFKA_CREATE_TOPICS='events' -v /var/run/docker.sock:/var/run/docker.sock -p 9092:9092 wurstmeister/kafka
 
 install:
   - npm install
