@@ -2,7 +2,7 @@
 jest.unmock("kafkajs");
 
 const { ServiceBroker } = require("moleculer");
-const { Emitter } = require("../index");
+const { Middleware } = require("../index");
 
 //const timestamp = Date.now();
 
@@ -28,7 +28,7 @@ describe("Test publisher service", () => {
         broker = new ServiceBroker({
             logger: console,
             logLevel: "debug", //"debug"
-            middlewares: [Emitter],
+            middlewares: [Middleware],
             emitter: { 
                 brokers: process.env.KAFKA_BROKER ? [process.env.KAFKA_BROKER] : ["localhost:9092"]
             }
