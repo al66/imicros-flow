@@ -12,7 +12,7 @@ before_install:
 - docker pull wurstmeister/zookeeper
 - docker pull wurstmeister/kafka
 - docker run -d -p 2181:2181 wurstmeister/zookeeper
-- docker run -d -p 9092:9092 wurstmeister/kafka --env KAFKA_ADVERTISED_HOST_NAME=127.0.0.1 --env KAFKA_ADVERTISED_PORT=9092 --env KAFKA_ZOOKEEPER_CONNECT=127.0.0.1:2181 --env KAFKA_AUTO_CREATE_TOPICS_ENABLE=true wurstmeister/kafka
+- docker run -d -p 9092:9092 wurstmeister/kafka --env KAFKA_ADVERTISED_HOST_NAME=127.0.0.1 KAFKA_ADVERTISED_PORT=9092 KAFKA_ZOOKEEPER_CONNECT=127.0.0.1:2181 KAFKA_AUTO_CREATE_TOPICS_ENABLE=true wurstmeister/kafka
 
 install:
   - npm install
