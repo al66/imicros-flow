@@ -4,12 +4,14 @@
 "use strict";
 
 module.exports = {
+    // Static [kafka]
     Publisher: require("./lib/flow.publisher"),
+    StaticSubscriber: require("./lib/flow.static.subscriber"),
+    // Dynamic [Neo4j]
     Controller: require("./lib/flow.control"),
     Query: require("./lib/flow.query"),
     Listener: require("./lib/flow.listener"),
-    Store: require("./lib/flow.store"),
+    Emitter: require("./lib/flow.emitter"),
     Middleware: require("./lib/flow.middleware"),
-    StaticSubscriber: require("./lib/flow.static.subscriber"),
     Serializer: require("./lib/util/serializer")
 };

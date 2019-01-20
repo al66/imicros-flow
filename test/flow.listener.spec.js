@@ -1,10 +1,22 @@
 "use strict";
 
 const { ServiceBroker } = require("moleculer");
+const { Listener } = require("../index");
+const { Emitter } = require("../index");
 const { Controller } = require("../index");
 const { Query } = require("../index");
 
 const timestamp = Date.now();
+
+const options = {
+    settings: { 
+        db: {
+            uri: process.env.URI || "bolt://localhost:7687",
+            user: "neo4j",
+            password: "neo4j"
+        }
+    }
+};
 
 beforeAll( async () => {
 });
@@ -12,48 +24,84 @@ beforeAll( async () => {
 afterAll( async () => {
 });
 
-describe("Test db.neo4j", () => {
+describe("Test flow.listener", () => {
 
-    let broker, control, query;
+    let broker, emitter, listener, control, query;
     beforeAll(() => {
         broker = new ServiceBroker({
             logger: console,
-            logLevel: "info" //"debug"
+            logLevel: "debug" //"debug"
         });
-        control = broker.createService(Controller, Object.assign({
-            settings: { 
-                db: {
-                    uri: process.env.URI || "bolt://localhost:7687",
-                    user: "neo4j",
-                    password: "neo4j"
-                }
-            }
-        }));
-        query = broker.createService(Query, Object.assign({
-            settings: {
-                db: {
-                    uri: process.env.URI || "bolt://localhost:7687",
-                    user: "neo4j",
-                    password: "neo4j"
-                }
-            }
-        }));
+        emitter = broker.createService(Emitter, Object.assign(options));
+        listener = broker.createService(Listener, Object.assign(options));
+        control = broker.createService(Controller, Object.assign(options));
+        query = broker.createService(Query, Object.assign(options));
         return broker.start();
     });
     
     afterAll(async () => {
+        // wait some time for consuming
+        /*
+        await new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 100);
+        });
+        */
         await broker.stop();
     });
     
     describe("Test create service", () => {
 
-        it("it should be created", () => {
+        it("services should be created", () => {
+            expect(emitter).toBeDefined();
+            expect(listener).toBeDefined();
             expect(control).toBeDefined();
             expect(query).toBeDefined();
         });
         
     });
 
+    describe("Test emitter", () => {
+
+        let opts;
+        beforeEach(() => {
+            opts = { meta: { user: { id: `1-${timestamp}` , email: `1-${timestamp}@host.com` } } };
+        });
+        
+        it("it should emit an event", async () => {
+            let params = {
+                eventName: "my.event",
+                payload: {
+                    this: {
+                        is: {
+                            the: {
+                                final: "result"
+                            }
+                        }
+                    }
+                },
+                meta: {
+                    owner: {
+                        type: "group",
+                        id: `group1-${timestamp}`
+                    },
+                    flow: {
+                        process: "my.process",
+                        step: "first.step",
+                        contextId: `context1-${timestamp}`
+                    }
+                }
+            };
+            return broker.call("flow.emitter.emit", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toEqual(true);
+            });
+        });
+        
+    });
+    
+    /*
     describe("Test add next", () => {
 
         let opts;
@@ -300,5 +348,6 @@ describe("Test db.neo4j", () => {
         });
 
     });
+    */
     
 });

@@ -61,6 +61,13 @@ describe("Test serializer", () => {
         expect(decoded).toEqual(number);
     });
 
+    it("it should serialize a timestamp", async () => {
+        let timestamp = Date.now();
+        let encoded = await serializer.serialize(timestamp) + "";
+        let decoded = await serializer.deserialize(encoded);
+        expect(decoded).toEqual(timestamp);
+    });
+
     it("it should serialize a function", async () => {
         function testFunction(param1, param2) {
             return param1 + param2;

@@ -13,7 +13,9 @@
     "test-static-subscriber": "jest test/flow.static.subscriber.spec.js --no-cache --verbose",
     "test-db": "jest test/db.neo4j.spec.js --no-cache --config=local.js",
     "test-control": "jest test/flow.control.spec.js --no-cache --config=local.js",
+    "test-listener": "jest test/flow.listener.spec.js --no-cache --config=local.js",
     "test-middleware": "jest test/flow.middleware.spec.js --no-cache --config=local.js",
+    "test-connector": "jest test/flow.connector.spec.js --no-cache --config=local.js",
     "test-store": "jest test/flow.store.spec.js --no-cache --config=local.js",
     "test-mapper": "jest test/mapper.spec.js --no-cache",
     "test-size": "jest test/size.spec.js --no-cache",
@@ -23,14 +25,19 @@
     "collectCoverageFrom": [
       "lib/*.js",
       "lib/util/*.js",
-        "!**/flow.listener.js",
-        "!**/flow.query.js"
+      "!**/flow.listener.js",
+      "!**/flow.query.js"
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
+      "/dev/",
       "/lib/util/errors.js",
       "/lib/flow.listener.js",
       "/lib/flow.query.js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dev/"
     ],
     "rootDir": ".",
     "roots": [
@@ -54,6 +61,7 @@
   "dependencies": {
     "ioredis": "^4.3.0",
     "kafkajs": "^1.4.6",
+    "lodash": "^4.17.11",
     "neo4j-driver": "^1.7.2",
     "uuidv4": "^1.0.1"
   }

@@ -1,10 +1,9 @@
 "use strict";
-jest.unmock("kafkajs");
 
 const { ServiceBroker } = require("moleculer");
 const { Middleware } = require("../index");
 
-//const timestamp = Date.now();
+const timestamp = Date.now();
 
 let test = {
     name: "test",
@@ -29,18 +28,25 @@ describe("Test publisher service", () => {
             logger: console,
             logLevel: "debug", //"debug"
             middlewares: [Middleware],
-            emitter: { 
-                brokers: process.env.KAFKA_BROKER ? [process.env.KAFKA_BROKER] : ["localhost:9092"]
+            flow: {
+                uri: process.env.URI || "bolt://localhost:7474",
+                user: "neo4j",
+                password: "neo4j"
             }
         });
         broker.createService(test);
         //service = broker.createService(Publisher, Object.assign({ settings: { brokers: ["localhost:9092"] } }));
         return broker.start()
-            .then(() => {
-                broker.emit("test.emitted.event", { a: 5 });
-                broker.emit("unvalid.emitted.event", { b: 7 });
-                broker.broadcast("test.broadcasted.event", { b: "John" });
-                broker.call("test.hello", { name: "John" }, {meta: {a: 5}})
+            .then(async () => {
+                await broker.emit("test.emitted.event", { a: 5 });
+                await broker.emit("unvalid.emitted.event", { b: 7 });
+                await broker.broadcast("test.broadcasted.event", { b: "John" });
+                let meta = {
+                    a: 5, 
+                    owner: { type: "group",id: "group" + timestamp },
+                    onDone: { event: "test.hello.done" }
+                };
+                await broker.call("test.hello", { name: "John" }, { meta: meta })
                     .then(res => broker.logger.info("Res:", res));
             });
     });
