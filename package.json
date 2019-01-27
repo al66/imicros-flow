@@ -8,7 +8,7 @@
   "scripts": {
     "test": "jest --coverage --no-cache",
     "test-local": "jest --coverage --no-cache --config=local.js",
-    "test-travis": "jest test/flow.middleware.spec.js --coverage --no-cache --config=travis.js",
+    "test-travis": "jest --coverage --no-cache --config=travis.js",
     "test-publisher": "jest test/flow.publisher.spec.js --no-cache",
     "test-static-subscriber": "jest test/flow.static.subscriber.spec.js --no-cache --verbose",
     "test-db": "jest test/db.neo4j.spec.js --no-cache --config=local.js",
@@ -18,6 +18,7 @@
     "test-connector": "jest test/flow.connector.spec.js --no-cache --config=local.js",
     "test-store": "jest test/flow.store.spec.js --no-cache --config=local.js",
     "test-mapper": "jest test/mapper.spec.js --no-cache",
+    "test-mapper-cover": "jest test/mapper.spec.js --no-cache --coverage",
     "test-size": "jest test/size.spec.js --no-cache",
     "test-serializer": "jest test/serializer.spec.js --no-cache"
   },

@@ -77,6 +77,18 @@ describe("Test serializer", () => {
         expect(decoded("Hallo,", "Echo")).toEqual("Hallo,Echo");
     });
 
+    it("it should serialize an embedded function", async () => {
+        function testFunction(param1, param2) {
+            return param1 + param2;
+        }
+        let test = {
+            func: testFunction
+        };
+        let encoded = await serializer.serialize(test) + "";
+        let decoded = await serializer.deserialize(encoded);
+        expect(decoded.func("Hallo,", "Echo")).toEqual("Hallo,Echo");
+    });
+
     it("it should serialize a stream", async () => {
         let filename = "./test/serializer.test.file.json";
         let stream = fs.createReadStream(filename);
