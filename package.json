@@ -1,6 +1,6 @@
 {
   "name": "imicros-flow",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
   "description": "Moleculer service for loose coupled event handling",
@@ -54,16 +54,16 @@
     "events"
   ],
   "devDependencies": {
-    "coveralls": "^3.0.2",
-    "jest": "^22.4.3",
-    "moleculer": "^0.13.5",
-    "nats": "^0.8.10"
+    "coveralls": "^3.0.3",
+    "jest": "^24.3.1",
+    "moleculer": "^0.13.7",
+    "nats": "^1.2.2"
   },
   "dependencies": {
-    "ioredis": "^4.3.0",
-    "kafkajs": "^1.4.6",
+    "ioredis": "^4.6.2",
+    "kafkajs": "^1.5.0",
     "lodash": "^4.17.11",
-    "neo4j-driver": "^1.7.2",
-    "uuidv4": "^1.0.1"
+    "neo4j-driver": "^1.7.3",
+    "uuidv4": "^3.0.1"
   }
 }
