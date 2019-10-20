@@ -10,8 +10,7 @@ module.exports = {
     // Dynamic [Neo4j]
     Controller: require("./lib/flow.control"),
     Query: require("./lib/flow.query"),
-    Listener: require("./lib/flow.listener"),
-    Emitter: require("./lib/flow.emitter"),
-    Middleware: require("./lib/flow.middleware"),
-    Serializer: require("./lib/util/serializer")
+    Serializer: require("./lib/util/serializer"),
+    Queue: require("./lib/flow.queue"),
+    Next: require("./lib/flow.next")
 };

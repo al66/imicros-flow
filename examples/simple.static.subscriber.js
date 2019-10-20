@@ -15,7 +15,7 @@ broker.createService(StaticSubscriber, Object.assign({
         subscriptions: [
             {
                 id: "step.one" + timestamp,
-                topic: "users",
+                topic: "events2",
                 event: "user.created",
                 params: { userId: "payload.user.id" },
                 action: "registration.requestConfirmationMail",
@@ -27,7 +27,7 @@ broker.createService(StaticSubscriber, Object.assign({
             },
             {
                 id: "step.two" + timestamp ,
-                topic: "mailer",
+                topic: "events2",
                 event: "request.sendMail",
                 action: "mailer.sendmail"       // will be called with params = payload
             }
@@ -64,7 +64,7 @@ broker.createService({
 let run = async () => {
     await broker.start();
     await broker.call("flow.publisher.emit", {
-        topic: "users",
+        topic: "events2",
         event: "user.created",
         payload: { user: { id: "123456789" } }
     }, {

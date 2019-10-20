@@ -1,68 +1,39 @@
 "use strict";
+//const mock = require("kafkajs").Kafka;
+//const { producers } = require("kafkajs");
+//jest.unmock("kafka-node");
 
 const { ServiceBroker } = require("moleculer");
-const { Middleware } = require("../index");
+const { Publisher } = require("../index");
+const { FlowPublishFailedAuthorization } = require("../lib/util/errors");
 
 const timestamp = Date.now();
-
-let test = {
-    name: "test",
-    actions: {
-        hello(ctx) {
-            this.broker.emit("test.emitted.event from action", { a: 5 }, null,{ "additonal": "data"});
-            return `Hello ${ctx.params.name}`;
-        },
-    },
-    events: {
-        "test.**"(payload, sender, eventName) {
-            this.logger.info(`Event '${eventName}' is received.`, payload);
-        }
-    }
-};
+const kafka = process.env.KAFKA_BROKER || "localhost:9092";
 
 describe("Test publisher service", () => {
 
-    let broker; //, service, opts;
+    let broker, service, opts;
     beforeAll(() => {
         broker = new ServiceBroker({
             logger: console,
-            logLevel: "debug", //"debug"
-            middlewares: [Middleware],
-            flow: {
-                uri: process.env.URI || "bolt://localhost:7474",
-                user: "neo4j",
-                password: "neo4j"
-            }
+            logLevel: "debug" //"debug"
         });
-        broker.createService(test);
-        //service = broker.createService(Publisher, Object.assign({ settings: { brokers: ["localhost:9092"] } }));
-        return broker.start()
-            .then(async () => {
-                await broker.emit("test.emitted.event", { a: 5 });
-                await broker.emit("unvalid.emitted.event", { b: 7 });
-                await broker.broadcast("test.broadcasted.event", { b: "John" });
-                let meta = {
-                    a: 5, 
-                    owner: { type: "group",id: "group" + timestamp },
-                    onDone: { event: "test.hello.done" }
-                };
-                await broker.call("test.hello", { name: "John" }, { meta: meta })
-                    .then(res => broker.logger.info("Res:", res));
-            });
+        service = broker.createService(Publisher, Object.assign({ settings: { brokers: [kafka] } }));
+        return broker.start();
     });
     
     afterAll(async () => {
         await broker.stop();
     });
     
-    describe("Test broker", () => {
+    describe("Test create service", () => {
 
         it("it should be created", () => {
-            expect(broker).toBeDefined();
+            expect(service).toBeDefined();
+            //expect(producers.length).toBe(1);
         });
     });
 
-    /*
     describe("Test emit event ", () => {
 
         beforeEach(() => {
@@ -135,6 +106,7 @@ describe("Test publisher service", () => {
             });
         });
         
+        /*
         it("it should throw an error", async () => {
             let params = {
                 event: "test.other",
@@ -146,10 +118,11 @@ describe("Test publisher service", () => {
                 expect(err.message).toBe("simulated fail of producer.send");
             });
         });
+        */
         
-        it("it should emit event to topic 'another'", () => {
+        it("it should emit event to topic 'events'", () => {
             let params = {
-                topic: "another",
+                topic: "events",
                 event: "test.emit",
                 payload: { msg: "say hello to the world" }
             };
@@ -157,12 +130,11 @@ describe("Test publisher service", () => {
                 expect(res.success).toBeDefined();
                 expect(res.content).toEqual(expect.objectContaining({event: params.event, payload: params.payload}));
                 expect(res.content.meta).toBeDefined();
-                expect(res.topic).toEqual("another");
+                expect(res.topic).toEqual("events");
             });
         });
         
     });
-    */
 
     /*
     describe("Test kafka errors ", () => {

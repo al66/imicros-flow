@@ -1,5 +1,5 @@
 "use strict";
-const mock = require("kafkajs").Kafka;
+//const mock = require("kafkajs").Kafka;
 const { producers } = require("kafkajs");
 
 const { ServiceBroker } = require("moleculer");
