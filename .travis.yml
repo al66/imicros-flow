@@ -1,5 +1,9 @@
 language: node_js
 
+jdk:
+  # Needed for local Neo4j 2.0+
+  - oraclejdk8
+
 services:
 - docker
 - neo4j
