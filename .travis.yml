@@ -10,8 +10,8 @@ services:
 # - neo4j
 
 env:
-  # Test across multiple versions of Neo4j:
-  - NEO4J_VERSION="3.5.12"
+# Test across multiple versions of Neo4j:
+- NEO4J_VERSION="3.5.12"
 
 addons:
   hosts:
@@ -28,14 +28,14 @@ before_install:
 - docker run -d --name zookeeper -p 2181:2181 zookeeper
 - docker pull wurstmeister/kafka
 - docker run -d --name kafka --link zookeeper:zookeeper -e KAFKA_ADVERTISED_HOST_NAME=kafka  -e KAFKA_ADVERTISED_PORT=9092 -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181  -e KAFKA_AUTO_CREATE_TOPICS_ENABLE=true -e KAFKA_CREATE_TOPICS='events' -v /var/run/docker.sock:/var/run/docker.sock -p 9092:9092 wurstmeister/kafka
-  # Install Neo4j locally:
-  - wget dist.neo4j.org/neo4j-community-$NEO4J_VERSION-unix.tar.gz
-  - tar -xzf neo4j-community-$NEO4J_VERSION-unix.tar.gz
-  - neo4j-community-$NEO4J_VERSION/bin/neo4j start
-  # HACK need to change the password initially; changing it and then reverting:
-  - sleep 10  # give Neo4J some time to start
-  - curl -v POST http://neo4j:neo4j@localhost:7474/user/neo4j/password -d"password=neo4j2"
-  - curl -v POST http://neo4j:neo4j2@localhost:7474/user/neo4j/password -d"password=neo4j"
+# Install Neo4j locally:
+- wget dist.neo4j.org/neo4j-community-$NEO4J_VERSION-unix.tar.gz
+- tar -xzf neo4j-community-$NEO4J_VERSION-unix.tar.gz
+- neo4j-community-$NEO4J_VERSION/bin/neo4j start
+# HACK need to change the password initially; changing it and then reverting:
+- sleep 10  # give Neo4J some time to start
+- curl -v POST http://neo4j:neo4j@localhost:7474/user/neo4j/password -d"password=neo4j2"
+- curl -v POST http://neo4j:neo4j2@localhost:7474/user/neo4j/password -d"password=neo4j"
 
 install:
   - npm install
