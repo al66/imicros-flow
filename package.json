@@ -1,43 +1,26 @@
 {
   "name": "imicros-flow",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
-  "description": "Moleculer service for loose coupled event handling",
+  "description": "Process engine of imicros framework",
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage --no-cache",
     "test-local": "jest --coverage --no-cache --config=local.js",
     "test-travis": "jest --coverage --no-cache --config=travis.js",
-    "test-publisher": "jest test/flow.publisher.spec.js --no-cache --config=local.js",
-    "test-static-subscriber": "jest test/flow.static.subscriber.spec.js --no-cache --verbose --config=local.js",
-    "test-db": "jest test/db.neo4j.spec.js --no-cache --config=local.js",
-    "test-control": "jest test/flow.control.spec.js --no-cache --config=local.js",
-    "test-listener": "jest test/flow.listener.spec.js --no-cache --config=local.js",
-    "test-middleware": "jest test/flow.middleware.spec.js --no-cache --config=local.js",
-    "test-connector": "jest test/flow.connector.spec.js --no-cache --config=local.js",
-    "test-connector-control": "jest test/flow.connector.control.spec.js --no-cache --config=local.js",
-    "test-store": "jest test/flow.store.spec.js --no-cache --config=local.js",
-    "test-queue": "jest test/flow.queue.spec.js --no-cache --config=local.js",
-    "test-next": "jest test/flow.next.spec.js --no-cache --config=local.js",
-    "test-mapper": "jest test/mapper.spec.js --no-cache",
-    "test-mapper-cover": "jest test/mapper.spec.js --no-cache --coverage",
-    "test-size": "jest test/size.spec.js --no-cache",
-    "test-serializer": "jest test/serializer.spec.js --no-cache"
+    "test-handler": "jest test/flow.handler.spec.js --no-cache --config=local.js",
+    "test-event": "jest test/flow.event.spec.js --no-cache --config=local.js"
   },
   "jest": {
     "collectCoverageFrom": [
       "lib/*.js",
-      "lib/util/*.js",
-      "!**/flow.listener.js",
-      "!**/flow.query.js"
+      "lib/util/*.js"
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "/dev/",
-      "/lib/util/errors.js",
-      "/lib/flow.listener.js",
-      "/lib/flow.query.js"
+      "/lib/util/errors.js"
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
@@ -54,19 +37,16 @@
   },
   "keywords": [
     "moleculer",
-    "events"
+    "process",
+    "engine"
   ],
   "devDependencies": {
-    "coveralls": "^3.0.7",
-    "jest": "^24.9.0",
-    "moleculer": "^0.13.11",
-    "nats": "^1.3.2"
+    "jest": "^25.5.4",
+    "moleculer": "^0.14.6",
+    "nats": "^1.4.9"
   },
   "dependencies": {
-    "ioredis": "^4.14.1",
-    "kafkajs": "^1.11.0",
     "lodash": "^4.17.15",
-    "neo4j-driver": "^1.7.6",
-    "uuidv4": "^3.0.1"
+    "uuid": "^8.0.0"
   }
 }

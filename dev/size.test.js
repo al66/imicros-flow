@@ -1,6 +1,6 @@
 "use strict";
 
-const size = require("../lib/util/size");
+const size = require("./size");
 
 describe("Test obejct size function", () => {
 
