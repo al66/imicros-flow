@@ -8,7 +8,17 @@ const _ = require("lodash");
 
 const timestamp = Date.now();
 const ownerId = uuid();
-const exchangeToken = "access token only valid for access by token service";
+const meta = { 
+    ownerId: ownerId,
+    acl: {
+        accessToken: "this is the access token",
+        ownerId: ownerId
+    }, 
+    user: { 
+        id: `1-${timestamp}` , 
+        email: `1-${timestamp}@host.com` }
+}; 
+
 
 // mock service flow.query
 let subscriptions = [];
@@ -37,17 +47,6 @@ let token = [];
 const Token = {
     name: "flow.token",
     actions: {
-        getExchangeToken: {
-            params: {
-                accessToken: { type: "string" },
-                processId: { type: "uuid" },
-                instanceId: { type: "uuid" }
-            },
-            handler(ctx) {
-                this.logger.info("token.getExchangeToken called", { params: ctx.params } );
-                return exchangeToken;
-            }
-        },
         update: {
             params: {
                 instanceId: { type: "uuid" },
@@ -90,9 +89,27 @@ const Context = {
     }
 };
 
+// mock service acl
+let accessToken = "access for group allowed";
+const ACL = {
+    name: "acl",
+    actions: {
+        requestAccess: {
+            params: {
+                forGroupId: { type: "string" }
+            },			
+            async handler(ctx) {
+                this.logger.info("acl.requestAccess called", { params: ctx.params, meta: ctx.meta } );
+                if (ctx.meta.user === meta.user) return { token: accessToken }; 
+                return false;
+            }
+        }
+    }
+};
+
 describe("Test event service", () => {
 
-    let broker, service, queryService, contextService, tokenService;
+    let broker, service, queryService, contextService, tokenService, aclService;
     beforeAll(() => {
     });
     
@@ -109,6 +126,7 @@ describe("Test event service", () => {
             queryService = await broker.createService(Query);
             contextService = await broker.createService(Context);
             tokenService = await broker.createService(Token);
+            aclService = await broker.createService(ACL);
             service = await broker.createService(Event, Object.assign({ 
                 name: "flow.event", 
                 settings: {
@@ -124,6 +142,7 @@ describe("Test event service", () => {
             expect(queryService).toBeDefined();
             expect(contextService).toBeDefined();
             expect(tokenService).toBeDefined();
+            expect(aclService).toBeDefined();
             expect(service).toBeDefined();
         });
 
@@ -135,16 +154,7 @@ describe("Test event service", () => {
         
         beforeEach(() => {
             opts = { 
-                meta: { 
-                    ownerId: ownerId,
-                    acl: {
-                        accessToken: "this is the access token",
-                        ownerId: ownerId
-                    }, 
-                    user: { 
-                        id: `1-${timestamp}` , 
-                        email: `1-${timestamp}@host.com` }
-                } 
+                meta: meta
             };
             token = [];
         });
@@ -175,7 +185,7 @@ describe("Test event service", () => {
                     type: subscriptions[0].type,
                     status: Constants.EVENT_ACTIVATED,
                     user: opts.meta.user,
-                    accessToken: exchangeToken
+                    ownerId: ownerId
                 }));
                 
             });
@@ -212,7 +222,7 @@ describe("Test event service", () => {
                     type: subscriptions[0].type,
                     status: Constants.EVENT_ACTIVATED,
                     user: opts.meta.user,
-                    accessToken: exchangeToken
+                    ownerId: ownerId
                 }));
                 expect(token[1]).toEqual(expect.objectContaining({
                     processId: subscriptions[1].processId,
@@ -221,7 +231,7 @@ describe("Test event service", () => {
                     type: subscriptions[1].type,
                     status: Constants.EVENT_ACTIVATED,
                     user: opts.meta.user,
-                    accessToken: exchangeToken
+                    ownerId: ownerId
                 }));
                 
             });

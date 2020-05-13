@@ -5,5 +5,6 @@
 
 module.exports = {
     Event: require("./lib/flow.event"),
-    Token: require("./lib/flow.token")
+    Token: require("./lib/flow.token"),
+    Next: require("./lib/flow.next")
 };

@@ -10,7 +10,8 @@
     "test-local": "jest --coverage --no-cache --silent --config=local.js",
     "test-travis": "jest --coverage --no-cache --config=travis.js",
     "test-token": "jest test/flow.token.spec.js --no-cache --config=local.js",
-    "test-event": "jest test/flow.event.spec.js --no-cache --config=local.js"
+    "test-event": "jest test/flow.event.spec.js --no-cache --config=local.js",
+    "test-next": "jest test/flow.next.spec.js --no-cache --config=local.js"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -43,6 +44,7 @@
   "dependencies": {
     "lodash": "^4.17.15",
     "uuid": "^8.0.0",
-    "imicros-flow-control": "^0.0.2"
+    "imicros-flow-control": "^0.0.2",
+    "imicros-streams": "^0.0.3"
   }
 }

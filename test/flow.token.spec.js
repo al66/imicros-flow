@@ -18,7 +18,6 @@ let meta = {
         id: `1-${timestamp}` , 
         email: `1-${timestamp}@host.com` }
 }; 
-let exchangeToken = "long time period valid access token for service access on behalf of user/owner";
 
 let process = {
     defaultEvent: {
@@ -112,13 +111,47 @@ const Context = {
 const Query = {
     name: "flow.query",
     actions: {
-        get: {
+        getTask: {
             params: {
                 processId: { type: "uuid" },
                 elementId: { type: "uuid" }
             },			
             async handler(ctx) {
-                this.logger.info("query.get called", { params: ctx.params } );
+                this.logger.info("query.Task called", { params: ctx.params, meta: ctx.meta } );
+                if (ctx.meta.ownerId !== ownerId) return false;
+                return process.current;
+            }
+        },
+        getSequence: {
+            params: {
+                processId: { type: "uuid" },
+                elementId: { type: "uuid" }
+            },			
+            async handler(ctx) {
+                this.logger.info("query.getSequence called", { params: ctx.params, meta: ctx.meta } );
+                if (ctx.meta.ownerId !== ownerId) return false;
+                return process.current;
+            }
+        },
+        getEvent: {
+            params: {
+                processId: { type: "uuid" },
+                elementId: { type: "uuid" }
+            },			
+            async handler(ctx) {
+                this.logger.info("query.getEvent called", { params: ctx.params, meta: ctx.meta } );
+                if (ctx.meta.ownerId !== ownerId) return false;
+                return process.current;
+            }
+        },
+        getGateway: {
+            params: {
+                processId: { type: "uuid" },
+                elementId: { type: "uuid" }
+            },			
+            async handler(ctx) {
+                this.logger.info("query.getGateway called", { params: ctx.params, meta: ctx.meta } );
+                if (ctx.meta.ownerId !== ownerId) return false;
                 return process.current;
             }
         },
@@ -128,7 +161,8 @@ const Query = {
                 elementId: { type: "uuid" }
             },			
             async handler(ctx) {
-                this.logger.info("query.next called", { params: ctx.params } );
+                this.logger.info("query.next called", { params: ctx.params, meta: ctx.meta } );
+                if (ctx.meta.ownerId !== ownerId) return false;
                 return process.next;
             }
         }
@@ -136,25 +170,23 @@ const Query = {
 };
 
 // mock service acl
-let exchange;
+let accessToken = "access for group allowed";
 const ACL = {
     name: "acl",
     actions: {
-        exchange: {
+        requestAccess: {
             params: {
-                accessToken: { type: "string" },
-                processId: { type: "uuid" },
-                instanceId: { type: "uuid" },
-                serviceToken: { type: "string" }
+                forGroupId: { type: "string" }
             },			
             async handler(ctx) {
-                exchange = ctx.params;
-                this.logger.info("acl.exchange called", { params: ctx.params } );
-                return exchangeToken;
+                this.logger.info("acl.requestAccess called", { params: ctx.params, meta: ctx.meta } );
+                if (ctx.meta.user === meta.user && ctx.meta.ownerId === meta.ownerId && ctx.meta.serviceToken === process.env.SERVICE_TOKEN) return { token: accessToken }; 
+                return false;
             }
         }
     }
 };
+
 
 // mock service rules
 let ruleResult;
@@ -310,31 +342,6 @@ describe("Test handler service", () => {
         
     });
     
-    describe("Test exchange token", () => {
-
-        let opts;
-        
-        beforeEach(() => {
-            opts = {};
-        });
-        
-        it("it should retrieve exchange token for service access", () => {
-            let params = {
-                accessToken: "any valid token",
-                processId: uuid(),
-                instanceId: uuid()
-            };
-            return broker.call("token.getExchangeToken", params, opts).then(res => {
-                expect(res).toEqual(exchangeToken);
-                expect(exchange.accessToken).toEqual(params.accessToken);
-                expect(exchange.processId).toEqual(params.processId);
-                expect(exchange.instanceId).toEqual(params.instanceId);
-                expect(exchange.serviceToken).toBeDefined();
-            });
-        });
-        
-    });
-
     describe("Test event", () => {
 
         let opts;
@@ -353,7 +360,7 @@ describe("Test handler service", () => {
                 type: Constants.DEFAULT_EVENT,
                 status: Constants.EVENT_ACTIVATED,
                 user: meta.user,
-                accessToken: meta.acl.accessToken
+                ownerId: meta.ownerId
             };
             token = [];
             stream = [];
@@ -375,7 +382,7 @@ describe("Test handler service", () => {
                 type: Constants.DEFAULT_EVENT,
                 status: Constants.EVENT_OCCURED,
                 user: meta.user,
-                accessToken: meta.acl.accessToken
+                ownerId: meta.ownerId
             };
             process.next = [{ processId: params.processId, elementId: uuid(), type: Constants.SEQUENCE_STANDARD }];
             token = [];
@@ -389,7 +396,7 @@ describe("Test handler service", () => {
                     type: process.next[0].type,
                     status: Constants.SEQUENCE_ACTIVATED,
                     user: params.user,
-                    accessToken: params.accessToken
+                    ownerId: meta.ownerId
                 };
                 expect(token[0]).toEqual(token1);
                 expect(stream[0]).toEqual(token1);
@@ -417,7 +424,7 @@ describe("Test handler service", () => {
                 type: Constants.SEQUENCE_STANDARD,
                 status: Constants.SEQUENCE_ACTIVATED,
                 user: meta.user,
-                accessToken: meta.acl.accessToken
+                ownerId: meta.ownerId
             };
             token = [];
             stream = [];
@@ -440,7 +447,7 @@ describe("Test handler service", () => {
                 type: Constants.SEQUENCE_STANDARD,
                 status: Constants.SEQUENCE_COMPLETED,
                 user: meta.user,
-                accessToken: meta.acl.accessToken
+                ownerId: meta.ownerId
             };
             process.next = [{ processId: params.processId, elementId: uuid(), type: Constants.SERVICE_TASK },
                             { processId: params.processId, elementId: uuid(), type: Constants.SERVICE_TASK }];
@@ -455,7 +462,7 @@ describe("Test handler service", () => {
                     type: process.next[0].type,
                     status: Constants.ACTIVITY_ACTIVATED,
                     user: params.user,
-                    accessToken: params.accessToken
+                    ownerId: meta.ownerId
                 };
                 let token2 = {
                     processId: params.processId,
@@ -464,7 +471,7 @@ describe("Test handler service", () => {
                     type: process.next[1].type,
                     status: Constants.ACTIVITY_ACTIVATED,
                     user: params.user,
-                    accessToken: params.accessToken
+                    ownerId: meta.ownerId
                 };
                 expect(token[0]).toEqual(token1);
                 expect(token[1]).toEqual(token2);
@@ -495,7 +502,7 @@ describe("Test handler service", () => {
                 type: Constants.SERVICE_TASK,
                 status: Constants.ACTIVITY_ACTIVATED,
                 user: meta.user,
-                accessToken: meta.acl.accessToken
+                ownerId: meta.ownerId
             };
             token = [];
             stream = [];
@@ -517,7 +524,7 @@ describe("Test handler service", () => {
                 type: Constants.SERVICE_TASK,
                 status: Constants.ACTIVITY_READY,
                 user: meta.user,
-                accessToken: meta.acl.accessToken
+                ownerId: meta.ownerId
             };
             token = [];
             stream = [];
