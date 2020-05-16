@@ -161,11 +161,15 @@ describe("Test event service", () => {
         
         it("it should push one subscription to the queue", () => {
             let params = {
+                offset: "123",
                 event: "first event",
                 payload: {
                     param1: 1,
                     param2: "first"
-                }
+                },
+                version: "1",
+                uid: uuid(),
+                timestamp: Date.now()
             };
             subscriptions = [{
                 processId: uuid(),
@@ -194,11 +198,15 @@ describe("Test event service", () => {
         
         it("it should push two subscriptions to the queue", () => {
             let params = {
+                offset: "124",
                 event: "first event",
                 payload: {
                     param1: 1,
                     param2: "first"
-                }
+                },
+                version: "1",
+                uid: uuid(),
+                timestamp: Date.now()
             };
             subscriptions = [{
                 processId: uuid(),
@@ -240,11 +248,15 @@ describe("Test event service", () => {
         
         it("it should push no subscription to the queue - query returns empty array", () => {
             let params = {
+                offset: "125",
                 event: "first event",
                 payload: {
                     param1: 1,
                     param2: "first"
-                }
+                },
+                version: "1",
+                uid: uuid(),
+                timestamp: Date.now()
             };
             subscriptions = [];
             _.set(opts.meta,"flow.processId",uuid());
@@ -259,11 +271,15 @@ describe("Test event service", () => {
         
         it("it should push no subscription to the queue - query returns null", () => {
             let params = {
+                offset: "126",
                 event: "first event",
                 payload: {
                     param1: 1,
                     param2: "first"
-                }
+                },
+                version: "1",
+                uid: uuid(),
+                timestamp: Date.now()
             };
             subscriptions = null;
             _.set(opts.meta,"flow.processId",uuid());
