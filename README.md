@@ -38,4 +38,4 @@ The processed token is replaced from the stream (also if processing has failed) 
 - type : type of the process element
 - status : status of the current step
 - user: user who has started the process (saved at process start in the initial token)
-- accessToken: exchange token requested from acl service for the instance at process start
+- ownerId: owner group according to access token at process start

@@ -3,6 +3,7 @@
 const { ServiceBroker } = require("moleculer");
 const { Token } = require("../index");
 const { Constants } = require("imicros-flow-control");
+const { AclMiddleware } = require("imicros-acl");
 const { v4: uuid } = require("uuid");
 
 const timestamp = Date.now();
@@ -193,6 +194,22 @@ const ACL = {
                 if (ctx.meta.user === meta.user && ctx.meta.ownerId === meta.ownerId && ctx.meta.serviceToken === process.env.SERVICE_TOKEN) return { token: accessToken }; 
                 return false;
             }
+        },
+        verify: {
+            params: {
+                token: { type: "string" }
+            },
+            async handler(ctx) {
+                this.logger.info("acl.verified called", { params: ctx.params, meta: ctx.meta } );
+                return { 
+                    acl: {
+                        accessToken: ctx.params.token,
+                        ownerId: ownerId,
+                        role: "admin",
+                        unrestricted: true
+                    } 
+                };
+            }
         }
     }
 };
@@ -247,7 +264,8 @@ describe("Test handler service", () => {
         it("it should start the broker", async () => {
             broker = new ServiceBroker({
                 logger: console,
-                logLevel: "info" //"debug"
+                logLevel: "info", //"debug"
+                middlewares: [AclMiddleware({service: "acl"})]
             });
             contextService = await broker.createService(Context);
             streamsService = await broker.createService(Streams);

@@ -3,6 +3,7 @@
 const { ServiceBroker } = require("moleculer");
 const { Event } = require("../index");
 const { Constants } = require("imicros-flow-control");
+const { AclMiddleware } = require("imicros-acl");
 const { v4: uuid } = require("uuid");
 const _ = require("lodash");
 
@@ -10,10 +11,12 @@ const timestamp = Date.now();
 const ownerId = uuid();
 const meta = { 
     ownerId: ownerId,
+    /*
     acl: {
         accessToken: "this is the access token",
         ownerId: ownerId
-    }, 
+    },
+    */
     user: { 
         id: `1-${timestamp}` , 
         email: `1-${timestamp}@host.com` }
@@ -35,7 +38,7 @@ const Query = {
                 instanceId: { type: "uuid", optional: true }
             },
             handler(ctx) {
-                this.logger.info("query.subscriptions called", ctx.params);
+                this.logger.info("query.subscriptions called", { params: ctx.params, meta: ctx.meta });
                 return subscriptions;
             }
         }
@@ -99,9 +102,25 @@ const ACL = {
                 forGroupId: { type: "string" }
             },			
             async handler(ctx) {
-                this.logger.info("acl.requestAccess called", { params: ctx.params, meta: ctx.meta } );
+                this.logger.info("acl.requestAccess called", { caller: ctx.caller, params: ctx.params, meta: ctx.meta } );
                 if (ctx.meta.user === meta.user) return { token: accessToken }; 
                 return false;
+            }
+        },
+        verify: {
+            params: {
+                token: { type: "string" }
+            },
+            async handler(ctx) {
+                this.logger.info("acl.verified called", { caller: ctx.caller, params: ctx.params, meta: ctx.meta } );
+                return { 
+                    acl: {
+                        accessToken: ctx.params.token,
+                        ownerId: ownerId,
+                        role: "admin",
+                        unrestricted: true
+                    } 
+                };
             }
         }
     }
@@ -121,7 +140,8 @@ describe("Test event service", () => {
         it("it should start the broker", async () => {
             broker = new ServiceBroker({
                 logger: console,
-                logLevel: "info" //"debug"
+                logLevel: "info", //"debug"
+                middlewares: [AclMiddleware({service: "acl"})]
             });
             queryService = await broker.createService(Query);
             contextService = await broker.createService(Context);

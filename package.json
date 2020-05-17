@@ -1,6 +1,6 @@
 {
   "name": "imicros-flow",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
   "description": "Process engine of imicros framework",
@@ -39,7 +39,8 @@
   "devDependencies": {
     "jest": "^25.5.4",
     "moleculer": "^0.14.6",
-    "nats": "^1.4.9"
+    "nats": "^1.4.9",
+    "imicros-acl": "^0.0.6"
   },
   "dependencies": {
     "lodash": "^4.17.15",
