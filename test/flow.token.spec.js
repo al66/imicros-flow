@@ -73,6 +73,16 @@ const Context = {
                 return true;
             }
         },
+        get: {
+            params: {
+                instanceId: { type: "uuid" },
+                key: { type: "string" }
+            },
+            handler(ctx) {
+                this.logger.info("context.get called", { params: ctx.params });
+                return context[ctx.params.instanceId] ? context[ctx.params.instanceId][ctx.params.key] : null;
+            }
+        },
         getKeys: {
             params: {
                 instanceId: { type: "uuid" },
@@ -534,16 +544,50 @@ describe("Test handler service", () => {
                 type: params.type,
                 attributes: {
                     action: "test.actionA",
+                    paramsKey: "myKey",
+                    resultKey: "actionA"
+                }
+            };
+            actionResult = {
+                test: "my result"  
+            };
+            context[params.instanceId] = [];
+            context[params.instanceId][process.current.attributes.paramsKey] = {  a: "test" };
+            return broker.call("token.handle", params, opts).then(res => {
+                let newToken = params;
+                newToken.status = Constants.ACTIVITY_COMPLETED;
+                expect(res).toEqual(true);
+                expect(token[0]).toEqual(newToken);
+                expect(stream[0]).toEqual(newToken);
+                expect(context[params.instanceId][process.current.attributes.resultKey]).toEqual(actionResult);
+            });
+            
+        });
+        
+        it("it should evaluate ruleset and emit activity completed token", () => {
+            let params = {
+                processId: uuid(),
+                instanceId: uuid(),
+                elementId: uuid(),
+                type: Constants.BUSINESS_RULE_TASK,
+                status: Constants.ACTIVITY_READY,
+                user: meta.user,
+                ownerId: meta.ownerId
+            };
+            token = [];
+            stream = [];
+            process.current = {
+                processId: params.processId,
+                elementId: params.elementId,
+                type: params.type,
+                attributes: {
                     contextKeys: [],
-                    parameterRule: "myRule",
-                    contextKey: "actionA"
+                    ruleset: "myRule",
+                    contextKey: "myRule"
                 }
             };
             ruleResult = {
                 a: "test"
-            };
-            actionResult = {
-                test: "my result"  
             };
             return broker.call("token.handle", params, opts).then(res => {
                 let newToken = params;
@@ -551,7 +595,7 @@ describe("Test handler service", () => {
                 expect(res).toEqual(true);
                 expect(token[0]).toEqual(newToken);
                 expect(stream[0]).toEqual(newToken);
-                expect(context[params.instanceId][process.current.attributes.contextKey]).toEqual(actionResult);
+                expect(context[params.instanceId][process.current.attributes.contextKey]).toEqual(ruleResult);
             });
             
         });
