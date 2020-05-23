@@ -108,10 +108,10 @@ const Context = {
                     optional: true
                 }
             },
-            handler(ctx) {
+            async handler(ctx) {
                 this.logger.info("token.update called", { instanceId: ctx.params.instanceId, consume: ctx.params.consume, emit: ctx.params.emit } );
-                if (ctx.params.consume) ctx.params.consume.map(c => { token = token.filter(t => t !==  c); });
-                if (ctx.params.emit) ctx.params.emit.map(t => token.push(t));
+                if (ctx.params.consume) await ctx.params.consume.map(c => { token = token.filter(t => t !==  c); });
+                if (ctx.params.emit) await ctx.params.emit.map(t => token.push(t));
                 return true;
             }
         }
@@ -250,6 +250,11 @@ const Test = {
     }
 };
 
+
+function sleep(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
 describe("Test handler service", () => {
 
     let broker, service, contextService, streamsService, queryService, aclService, rulesService, testService;
@@ -306,7 +311,7 @@ describe("Test handler service", () => {
             };
         });
         
-        it("it should emit token A", () => {
+        it("it should emit token A", async () => {
             instanceId = uuid();
             tokenA = {
                 processId: uuid(),
@@ -319,15 +324,15 @@ describe("Test handler service", () => {
                 emit: [tokenA]
             };
             token = [];
-            return broker.call("token.update", params, opts).then(res => {
-                expect(res).toEqual(true);
-                expect(token.length).toEqual(1);
-                expect(token[0]).toEqual(tokenA);
-            });
+            let res = await broker.call("token.update", params, opts);
+            await sleep(50);
+            expect(res).toEqual(true);
+            expect(token.length).toEqual(1);
+            expect(token[0]).toEqual(tokenA);
             
         });
  
-        it("it should consume token A and emit token B and C", () => {
+        it("it should consume token A and emit token B and C", async () => {
             instanceId = uuid();
             tokenB = {
                 processId: uuid(),
@@ -346,25 +351,25 @@ describe("Test handler service", () => {
                 consume: [tokenA],
                 emit: [tokenB,tokenC]
             };
-            return broker.call("token.update", params, opts).then(res => {
-                expect(res).toEqual(true);
-                expect(token.length).toEqual(2);
-                expect(token[0]).toEqual(tokenB);
-                expect(token[1]).toEqual(tokenC);
-            });
+            let res = await broker.call("token.update", params, opts);
+            await sleep(50);
+            expect(res).toEqual(true);
+            expect(token.length).toEqual(2);
+            expect(token[0]).toEqual(tokenB);
+            expect(token[1]).toEqual(tokenC);
             
         });
         
-        it("it should consume token B and C", () => {
+        it("it should consume token B and C", async () => {
             instanceId = uuid();
             let params = {
                 instanceId: instanceId,
                 consume: [tokenB,tokenC]
             };
-            return broker.call("token.update", params, opts).then(res => {
-                expect(res).toEqual(true);
-                expect(token.length).toEqual(0);
-            });
+            let res = await broker.call("token.update", params, opts);
+            await sleep(50);
+            expect(res).toEqual(true);
+            expect(token.length).toEqual(0);
             
         });
         

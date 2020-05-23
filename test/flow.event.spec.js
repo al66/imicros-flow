@@ -194,6 +194,7 @@ describe("Test event service", () => {
             subscriptions = [{
                 processId: uuid(),
                 elementId: uuid(),
+                ownerId: ownerId,
                 type: Constants.DEFAULT_EVENT
             }];
             _.set(opts.meta,"flow.processId",subscriptions[0].processId);
@@ -231,10 +232,12 @@ describe("Test event service", () => {
             subscriptions = [{
                 processId: uuid(),
                 elementId: uuid(),
+                ownerId: ownerId,
                 type: Constants.DEFAULT_EVENT
             },{
                 processId: uuid(),
                 elementId: uuid(),
+                ownerId: ownerId,
                 type: Constants.MESSAGE_EVENT
             }];
             _.set(opts.meta,"flow.processId",subscriptions[0].processId);
