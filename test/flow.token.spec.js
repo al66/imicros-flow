@@ -130,7 +130,7 @@ const Query = {
             async handler(ctx) {
                 this.logger.info("query.Task called", { params: ctx.params, meta: ctx.meta } );
                 if (ctx.meta.ownerId !== ownerId) return false;
-                return process.current;
+                return [process.current];
             }
         },
         getSequence: {
@@ -141,7 +141,7 @@ const Query = {
             async handler(ctx) {
                 this.logger.info("query.getSequence called", { params: ctx.params, meta: ctx.meta } );
                 if (ctx.meta.ownerId !== ownerId) return false;
-                return process.current;
+                return [process.current];
             }
         },
         getEvent: {
@@ -152,7 +152,7 @@ const Query = {
             async handler(ctx) {
                 this.logger.info("query.getEvent called", { params: ctx.params, meta: ctx.meta } );
                 if (ctx.meta.ownerId !== ownerId) return false;
-                return process.current;
+                return [process.current];
             }
         },
         getGateway: {
@@ -163,7 +163,7 @@ const Query = {
             async handler(ctx) {
                 this.logger.info("query.getGateway called", { params: ctx.params, meta: ctx.meta } );
                 if (ctx.meta.ownerId !== ownerId) return false;
-                return process.current;
+                return [process.current];
             }
         },
         next: {
