@@ -417,7 +417,7 @@ describe("Test handler service", () => {
                 user: meta.user,
                 ownerId: meta.ownerId
             };
-            process.next = [{ processId: params.processId, elementId: uuid(), type: Constants.SEQUENCE_STANDARD }];
+            process.next = [{ processId: params.processId, uid: uuid(), type: Constants.SEQUENCE_STANDARD }];
             token = [];
             stream = [];
             return broker.call("token.handle", params, opts).then(res => {
@@ -425,7 +425,7 @@ describe("Test handler service", () => {
                 let token1 = {
                     processId: params.processId,
                     instanceId: params.instanceId,
-                    elementId: process.next[0].elementId,
+                    elementId: process.next[0].uid,
                     type: process.next[0].type,
                     status: Constants.SEQUENCE_ACTIVATED,
                     user: params.user,
@@ -482,8 +482,8 @@ describe("Test handler service", () => {
                 user: meta.user,
                 ownerId: meta.ownerId
             };
-            process.next = [{ processId: params.processId, elementId: uuid(), type: Constants.SERVICE_TASK },
-                            { processId: params.processId, elementId: uuid(), type: Constants.SERVICE_TASK }];
+            process.next = [{ processId: params.processId, uid: uuid(), type: Constants.SERVICE_TASK },
+                            { processId: params.processId, uid: uuid(), type: Constants.SERVICE_TASK }];
             token = [];
             stream = [];
             return broker.call("token.handle", params, opts).then(res => {
@@ -491,7 +491,7 @@ describe("Test handler service", () => {
                 let token1 = {
                     processId: params.processId,
                     instanceId: params.instanceId,
-                    elementId: process.next[0].elementId,
+                    elementId: process.next[0].uid,
                     type: process.next[0].type,
                     status: Constants.ACTIVITY_ACTIVATED,
                     user: params.user,
@@ -500,7 +500,7 @@ describe("Test handler service", () => {
                 let token2 = {
                     processId: params.processId,
                     instanceId: params.instanceId,
-                    elementId: process.next[1].elementId,
+                    elementId: process.next[1].uid,
                     type: process.next[1].type,
                     status: Constants.ACTIVITY_ACTIVATED,
                     user: params.user,
