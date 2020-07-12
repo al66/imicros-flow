@@ -11,7 +11,10 @@
     "test-travis": "jest --coverage --no-cache --config=travis.js",
     "test-token": "jest test/flow.token.spec.js --no-cache --config=local.js",
     "test-event": "jest test/flow.event.spec.js --no-cache --config=local.js",
-    "test-next": "jest test/flow.next.spec.js --no-cache --config=local.js"
+    "test-next": "jest test/flow.next.spec.js --no-cache --config=local.js",
+    "test-t": "jest test/token.spec.js --no-cache --config=local.js",
+    "test-activity": "jest test/activity.spec.js --no-cache --config=local.js",
+    "test-sequence": "jest test/sequence.spec.js --no-cache --config=local.js"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -37,10 +40,11 @@
     "engine"
   ],
   "devDependencies": {
+    "benchmark": "^2.1.4",
+    "imicros-acl": "^0.0.6",
     "jest": "^25.5.4",
     "moleculer": "^0.14.6",
-    "nats": "^1.4.9",
-    "imicros-acl": "^0.0.6"
+    "nats": "^1.4.9"
   },
   "dependencies": {
     "lodash": "^4.17.15",
