@@ -39,7 +39,7 @@ describe("Test sequence service", () => {
             processId: uuid(),
             instanceId: uuid(),
             elementId: uuid(),
-            type: Constants.SEQUENCE_DEFAULT,
+            type: Constants.SEQUENCE_STANDARD,
             status: Constants.SEQUENCE_ACTIVATED,
             user: user,
             ownerId: ownerId
