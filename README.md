@@ -51,25 +51,12 @@ These packages/services requires an infrastructure of data stores
 - [ ] Parallel Event-based Gateway
 
 ### Events
-Events         | Start                                                   | Intermediate  | End
--------------- | ------------------------------------------------------- | ------------- | --------
-               | Standard        |  Interrupting    |  Non-interrupting  |               |
--------------- | --------------- | ---------------- | ------------------ | ------------- | --------
-None (untyped) |   - [x]         |
 
+Events         | Start                    | Intermediate             | End
+-------------- | ------------------------ | ------------------------ | ------------------------
+None (untyped) | [x] Standard  | [ ] Throwing | [ ] Standard
+Message        | [ ] Standard <br/> [ ] Interrupting <br/> [ ] Non-Interrupting | [ ] Catching <br/> [ ] Throwing | [ ] Standard
 
-- [x] Start Event
-- [ ] Intermediate Event
-- [x] End Event
-#### Event Types
-- [x] Untyped
-- [ ] Message
-- [ ] Timer
-- [ ] Intermediate Event
-- [ ] Intermediate Event
-- [ ] Intermediate Event
-- [ ] Intermediate Event
-- [ ] Intermediate Event
 
 
 ## Concept of token
