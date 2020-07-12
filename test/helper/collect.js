@@ -1,3 +1,5 @@
+// helper - collects all emitted events
+
 const Collect = {
     name: "helper.collect",
     events: {

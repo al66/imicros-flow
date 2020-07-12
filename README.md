@@ -14,37 +14,33 @@ $ npm install imicros-flow --save
 ## Usage
 The services `flow.token`, `flow.next`, `flow.activity`, `flow.sequence`, `flow.gateway` are running worker services reacting on different events (namespace `flow.*`).
 
-New processes are triggered by event subscriptions defined in process control and queried by service `flow.query` / task `subscripitions`.
-Service `flow.event` is listening to each* emmitted event in molculer and starts a new process if a subscription exsits.
+New processes are triggered by event subscriptions defined in process control and queried by service `flow.query` / action `subscripitions`.
+Service `flow.event` is listening to each* submitted event in molculer and starts a new process if a subscription exsits.
 
-* with exception of internal events `$**` or own events of this module `flow.*`.
+* with exception of internal events `$**` or own submitted events `flow.*`.
 
 ## Dependencies
 The engine requires additional running services of the following packages: 
-- imicros-flow-control (service `flow.query`) for process defintion uses [Neo4j](https://neo4j.com/) as graph database
+- imicros-flow-control (service `flow.query`) for querying process defintion uses [Neo4j](https://neo4j.com/) as graph database
 - imicros-flow-context (service `flow.context`) for storing the context of a running process uses [Cassandra](https://cassandra.apache.org/) as database
 - imicros-acl (service `acl`) for checking authorizations
+- imicros-rules (service `rules`) for evaluation business rules
 
-But these services can also replaced by own services with similar functionality - refer to the mocks in test/helper.
+But these services can also be replaced by own services with similar functionality - refer to the mocks in test/helper.
 
 ## BPMN Background 
 
 ### Support of the following [BPMN elements](https://www.bpmnquickguide.com/view-bpmn-quick-guide/) 
+The goal is to cover all of them in the final version :wink:.
 
 #### Activites
-- [x] Task
-- [ ] Transaction
-- [ ] Event Sub-Process
-- [ ] Call Activity
 
-##### Task Types
-- [ ] Send Task
-- [ ] Receive Task
-- [ ] User Task
-- [ ] Maunal Task
-- [x] Business Rule Task
-- [x] Service Task
-- [ ] Script Task
+Activities  |  Types  |  Markers  
+----------- | ------- | ---------
+Task        | [ ] Send Task  <br/> [ ] Receive Task <br/> [ ] User Task <br/> [ ] Manual Task <br/> [x] Business Rule Task <br/> [x] Service Task <br/> [ ] Script Task | [ ] Parallel <br/> [ ] Sequential <br/> [ ] Ad Hoc  
+Sub-Process  |         | [ ] Loop <br/> [ ] Parallel <br/> [ ] Sequential <br/> [ ] Ad Hoc <br/> [ ] Compensation
+Event Sub-Process  |         | [ ] Loop <br/> [ ] Parallel <br/> [ ] Sequential <br/> [ ] Ad Hoc <br/> [ ] Compensation
+Transaction  |         | [ ] Loop <br/> [ ] Parallel <br/> [ ] Sequential <br/> [ ] Compensation
 
 #### Sequence Flow
 - [x] Standard Flow
