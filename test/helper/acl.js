@@ -21,7 +21,7 @@ const meta = {
     }, 
     user: user
 }; 
-const serviceToken = "this is the service token";
+const serviceToken = process.env.SERVICE_TOKEN;
 
 // mock service acl
 const ACL = {

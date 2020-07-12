@@ -1,4 +1,5 @@
 const process = {};
+const subscriptions = [];
 
 // mock service query
 const Query = {
@@ -48,6 +49,20 @@ const Query = {
                 return [process.current];
             }
         },
+        subscriptions: {
+            params: {
+                name: { type: "string" },
+                version: { type: "string", optional: true },
+                id: { type: "string", optional: true },
+                processId: { type: "uuid", optional: true },
+                elementId: { type: "uuid", optional: true },
+                instanceId: { type: "uuid", optional: true }
+            },
+            handler(ctx) {
+                this.logger.info("query.subscriptions called", { params: ctx.params, meta: ctx.meta, subscriptions });
+                return subscriptions;
+            }
+        },
         next: {
             params: {
                 processId: { type: "uuid" },
@@ -67,5 +82,6 @@ const Query = {
 
 module.exports = {
     process: process,
+    subscriptions: subscriptions,
     Query: Query
 };

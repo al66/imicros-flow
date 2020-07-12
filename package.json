@@ -14,7 +14,8 @@
     "test-next": "jest test/flow.next.spec.js --no-cache --config=local.js",
     "test-t": "jest test/token.spec.js --no-cache --config=local.js",
     "test-activity": "jest test/activity.spec.js --no-cache --config=local.js",
-    "test-sequence": "jest test/sequence.spec.js --no-cache --config=local.js"
+    "test-sequence": "jest test/sequence.spec.js --no-cache --config=local.js",
+    "test-e": "jest test/event.spec.js --no-cache --config=local.js"
   },
   "jest": {
     "collectCoverageFrom": [
