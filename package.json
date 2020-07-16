@@ -48,7 +48,7 @@
     "nats": "^1.4.9"
   },
   "dependencies": {
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "uuid": "^8.0.0",
     "imicros-flow-control": "^0.0.3",
     "imicros-streams": "^0.0.3"
