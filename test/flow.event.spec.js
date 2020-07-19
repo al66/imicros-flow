@@ -5,7 +5,8 @@ const { Event } = require("../index");
 const { Constants } = require("imicros-flow-control");
 const { AclMiddleware } = require("imicros-acl");
 const { v4: uuid } = require("uuid");
-const _ = require("lodash");
+//const _ = require("lodash");
+const _ = require("../lib/util/lodash");
 
 const timestamp = Date.now();
 const ownerId = uuid();

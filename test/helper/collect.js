@@ -13,6 +13,13 @@ const Collect = {
     }
 };
 
+function clear(calls) {
+    for (let event in calls) {
+        calls[event].splice(0, calls[event].length);
+    }
+}
+
 module.exports = {
-    Collect: Collect
+    Collect: Collect,
+    clear: clear
 };

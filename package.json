@@ -11,7 +11,7 @@
     "test-travis": "jest --coverage --no-cache --config=travis.js",
     "test-token": "jest test/flow.token.spec.js --no-cache --config=local.js",
     "test-event": "jest test/flow.event.spec.js --no-cache --config=local.js",
-    "test-next": "jest test/flow.next.spec.js --no-cache --config=local.js",
+    "test-next": "jest test/next.spec.js --no-cache --config=local.js",
     "test-t": "jest test/token.spec.js --no-cache --config=local.js",
     "test-activity": "jest test/activity.spec.js --no-cache --config=local.js",
     "test-sequence": "jest test/sequence.spec.js --no-cache --config=local.js",
@@ -20,7 +20,10 @@
   "jest": {
     "collectCoverageFrom": [
       "lib/*.js",
-      "lib/util/*.js"
+      "lib/util/*.js",
+      "!node_modules/",
+      "!/dev/",
+      "!test/helper/*.js"
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
@@ -48,9 +51,8 @@
     "nats": "^1.4.9"
   },
   "dependencies": {
-    "lodash": "^4.17.15",
-    "uuid": "^8.0.0",
-    "imicros-flow-control": "^0.0.3",
-    "imicros-streams": "^0.0.3"
+    "imicros-flow-control": "^0.0.4",
+    "imicros-streams": "^0.0.3",
+    "uuid": "^8.0.0"
   }
 }

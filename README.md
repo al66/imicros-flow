@@ -17,7 +17,7 @@ The services `flow.token`, `flow.next`, `flow.activity`, `flow.sequence`, `flow.
 New processes are triggered by event subscriptions defined in process control and queried by service `flow.query` / action `subscripitions`.
 Service `flow.event` is listening to each* submitted event in molculer and starts a new process if a subscription exsits.
 
-* with exception of internal events `$**` or own submitted events `flow.*`.
+*with exception of internal events `$**` or own submitted events `flow.*`.
 
 ## Dependencies
 The engine requires additional running services of the following packages: 
@@ -44,8 +44,8 @@ Transaction  |         | [ ] Loop <br/> [ ] Parallel <br/> [ ] Sequential <br/> 
 
 #### Sequence Flow
 - [x] Standard Flow
-- [ ] Conditional Flow
-- [ ] Default Flow
+- [x] Conditional Flow
+- [x] Default Flow
 
 #### Gateways
 - [ ] Exclusive Gateway

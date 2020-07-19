@@ -8,10 +8,9 @@ const { v4: uuid } = require("uuid");
 
 // helper & mocks
 const { Collect } = require("./helper/collect");
-const { Query, process, subscriptions } = require("./helper/query");
-const { Context, context } = require("./helper/context");
+const { Query, subscriptions } = require("./helper/query");
+const { Context } = require("./helper/context");
 const { ACL, user, ownerId, serviceToken } = require("./helper/acl");
-const { Test, call } = require("./helper/action");
 
 const calls = [];
 const CollectEvents = Object.assign(Collect,{ settings: { calls: calls }});
@@ -30,7 +29,7 @@ describe("Test activity service", () => {
     });    
     
     // Load services
-    [CollectEvents, Token, Event, Context, QueryACL, ACL, Test].map(service => { return master.createService(service); }); 
+    [CollectEvents, Token, Event, Context, QueryACL, ACL].map(service => { return master.createService(service); }); 
     // const [collect, token, activity, query] = [CollectEvents, Token, Activity, Query].map(service => { return master.createService(service); }); 
 
     // Start & Stop

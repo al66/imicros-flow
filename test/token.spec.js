@@ -28,7 +28,7 @@ describe("Test token service", () => {
     
     
      // Load services
-    const [collect, token, sequence] = [CollectEvents, Token, Sequence].map(service => { return master.createService(service); }); 
+    [CollectEvents, Token, Sequence].map(service => { return master.createService(service); }); 
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));
