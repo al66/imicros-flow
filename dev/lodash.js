@@ -11,3 +11,15 @@ console.log("_.get", _.get({ first: { second: { third: "property" } } },{}, "unv
 console.log("_.cloneDeep", _.cloneDeep({ first: { second: { third: "property" } } }));
 console.log("_.set", _.set({ "first": {} },"first.second.third", "property"));
 console.log("_.imit", _.omit({ "first": {} },["first.second.third"]));
+
+let old = { first: { second: { third: "property" } } };
+let clone = _.cloneDeep(old);
+
+old.first.second = null;
+console.log(clone);
+
+old = { first: { second: { third: "property" } } };
+clone = {...old};
+
+old.first.second = null;
+console.log(clone);

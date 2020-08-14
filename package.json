@@ -9,13 +9,12 @@
     "test": "jest --coverage --no-cache",
     "test-local": "jest --coverage --no-cache --silent --config=local.js",
     "test-travis": "jest --coverage --no-cache --config=travis.js",
-    "test-token": "jest test/flow.token.spec.js --no-cache --config=local.js",
-    "test-event": "jest test/flow.event.spec.js --no-cache --config=local.js",
     "test-next": "jest test/next.spec.js --no-cache --config=local.js",
-    "test-t": "jest test/token.spec.js --no-cache --config=local.js",
+    "test-token": "jest test/token.spec.js --no-cache --config=local.js",
     "test-activity": "jest test/activity.spec.js --no-cache --config=local.js",
     "test-sequence": "jest test/sequence.spec.js --no-cache --config=local.js",
-    "test-e": "jest test/event.spec.js --no-cache --config=local.js"
+    "test-event": "jest test/event.spec.js --no-cache --config=local.js",
+    "test-gateway": "jest test/gateway.spec.js --no-cache --config=local.js"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -51,8 +50,10 @@
     "nats": "^1.4.9"
   },
   "dependencies": {
+    "cron-parser": "^2.16.3",
     "imicros-flow-control": "^0.0.4",
     "imicros-streams": "^0.0.3",
+    "rfdc": "^1.1.4",
     "uuid": "^8.0.0"
   }
 }

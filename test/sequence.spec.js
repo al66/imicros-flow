@@ -95,7 +95,9 @@ describe("Test sequence service", () => {
                 expect(calls["flow.sequence.activated"].filter(o => o.payload.token == token)).toHaveLength(1);
                 // calls["flow.token.emit"].map(o => console.log(o.payload));
                 // calls["flow.sequence.evaluated"].map(o => console.log(o.payload));
-                expect(calls["flow.sequence.evaluated"].filter(o => o.payload.token.attributes == token.attributes)).toHaveLength(1);
+                expect(calls["flow.sequence.evaluated"]).toHaveLength(1);
+                expect(calls["flow.sequence.evaluated"][0].payload.token.attributes.defaultSequence).toEqual(token.attributes.defaultSequence);
+                expect(calls["flow.sequence.evaluated"][0].payload.token.attributes.waitFor).toEqual(token.attributes.waitFor);
                 expect(calls["flow.token.emit"].filter(o => o.payload.token.processId == token.processId && o.payload.token.status == Constants.SEQUENCE_COMPLETED)).toHaveLength(1);
                 expect(calls["flow.token.consume"].filter(o => o.payload.token.processId == token.processId && o.payload.token.status == Constants.SEQUENCE_ACTIVATED)).toHaveLength(1);
             }); 

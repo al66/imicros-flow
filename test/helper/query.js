@@ -73,6 +73,17 @@ const Query = {
                 if (ctx.meta.ownerId !== this.ownerId) return false;
                 return process.next;
             }
+        },
+        previous: {
+            params: {
+                processId: { type: "uuid" },
+                elementId: { type: "uuid" }
+            },			
+            async handler(ctx) {
+                this.logger.info("query.previous called", { params: ctx.params, meta: ctx.meta, process: process } );
+                if (ctx.meta.ownerId !== this.ownerId) return false;
+                return process.previous;
+            }
         }
     },
     created () {

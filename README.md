@@ -12,9 +12,9 @@ Process engine of imicros framework (based on [Moleculer](https://github.com/mol
 $ npm install imicros-flow --save
 ```
 ## Usage
-The services `flow.token`, `flow.next`, `flow.activity`, `flow.sequence`, `flow.gateway` are running worker services reacting on different events (namespace `flow.*`).
+The services `flow.token`, `flow.next`, `flow.activity`, `flow.sequence`, `flow.gateway`, `flow.process` are running worker services reacting on different events (namespace `flow.*`).
 
-New processes are triggered by event subscriptions defined in process control and queried by service `flow.query` / action `subscripitions`.
+New processes are triggered by event subscriptions defined in process control and queried by service `flow.query` with action `subscripitions`.
 Service `flow.event` is listening to each* submitted event in molculer and starts a new process if a subscription exsits.
 
 *with exception of internal events `$**` or own submitted events `flow.*`.
@@ -23,6 +23,7 @@ Service `flow.event` is listening to each* submitted event in molculer and start
 The engine requires additional running services of the following packages: 
 - imicros-flow-control (service `flow.query`) for querying process defintion uses [Neo4j](https://neo4j.com/) as graph database
 - imicros-flow-context (service `flow.context`) for storing the context of a running process uses [Cassandra](https://cassandra.apache.org/) as database
+- imicros-flow-store (service `flow.store`) for storing element status of a running process uses [Cassandra](https://cassandra.apache.org/) as database
 - imicros-acl (service `acl`) for checking authorizations
 - imicros-rules (service `rules`) for evaluation business rules
 
@@ -48,9 +49,9 @@ Transaction  |         | [ ] Loop <br/> [ ] Parallel <br/> [ ] Sequential <br/> 
 - [x] Default Flow
 
 #### Gateways
-- [ ] Exclusive Gateway
-- [ ] Event-based Gateway
-- [ ] Parallel Gateway
+- [x] Exclusive Gateway
+- [x] Event-based Gateway
+- [x] Parallel Gateway
 - [ ] Inclusive Gateway
 - [ ] Complex Gateway
 - [ ] Exclusive Event-based Gateway
@@ -62,7 +63,7 @@ Events         | Start                    | Intermediate             | End
 -------------- | ------------------------ | ------------------------ | ------------------------
 None (untyped) | [x] Standard  | [ ] Throwing | [ ] Standard <br/> [ ] Terminate Immediatly
 Message        | [ ] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting <br/> [ ] Throwing | [ ] Standard
-Timer          | [ ] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | 
+Timer (1)      | [x] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [x] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | 
 Escalation     | [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting  [ ] Throwing | [ ] Standard
 Conditional    | [ ] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | 
 Error          | [ ] Boundary Interrupting | [ ] Boundary Interrupting | [ ] Standard
@@ -71,6 +72,8 @@ Compensation   | [ ] Boundary Interrupting | [ ] Boundary Interrupting <br/> [ ]
 Signal         | [ ] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting <br/> [ ] Throwing | [ ] Standard
 Multiple       | [ ] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting <br/> [ ] Throwing | [ ] Standard
 Parallel Multiple  | [ ] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | 
+
+(1) Start timer event currently supports only cron syntax for scheduling. The intermediate timer event supports only to wait a specific time defined by given month/days/hours/seconds which are added to the date when the event is activated.
 
 
 ### Concept of token
