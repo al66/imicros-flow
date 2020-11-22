@@ -4,7 +4,7 @@
 "use strict";
 
 module.exports = {
-    Event: require("./lib/flow.event"),
-    Token: require("./lib/flow.token"),
-    Next: require("./lib/flow.next")
+    Event: require("./lib/event"),
+    Token: require("./lib/token"),
+    Next: require("./lib/next")
 };

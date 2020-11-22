@@ -2,8 +2,8 @@
 
 const { ServiceBroker } = require("moleculer");
 const { Constants } = require("imicros-flow-control");
-const Token = require("../lib/token");
-const Event = require("../lib/event");
+const { Token } = require("../index");
+const { Event } = require("../index");
 const { v4: uuid } = require("uuid");
 
 // helper & mocks
