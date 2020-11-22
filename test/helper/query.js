@@ -51,7 +51,7 @@ const Query = {
         },
         subscriptions: {
             params: {
-                name: { type: "string" },
+                eventName: { type: "string" },
                 version: { type: "string", optional: true },
                 id: { type: "string", optional: true },
                 processId: { type: "uuid", optional: true },

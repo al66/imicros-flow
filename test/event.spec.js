@@ -11,6 +11,7 @@ const { Collect, clear } = require("./helper/collect");
 const { Query, subscriptions, process } = require("./helper/query");
 const { Context } = require("./helper/context");
 const { ACL, user, ownerId, serviceToken } = require("./helper/acl");
+const { Timer } = require("./helper/timer");
 
 const calls = [];
 const CollectEvents = Object.assign(Collect,{ settings: { calls: calls }});
@@ -23,13 +24,13 @@ describe("Test activity service", () => {
             namespace: "token",
             nodeID: nodeID,
             // transporter: "nats://192.168.2.124:4222",
-            // logLevel: "debug" //"info" //"debug"
+            // logLevel: "info" //"debug"
             logger: false 
         });        
     });    
     
     // Load services
-    [CollectEvents, Token, Event, Context, QueryACL, ACL].map(service => { return master.createService(service); }); 
+    [CollectEvents, Token, Event, Context, QueryACL, ACL, Timer].map(service => { return master.createService(service); }); 
     // const [collect, token, activity, query] = [CollectEvents, Token, Activity, Query].map(service => { return master.createService(service); }); 
 
     // Start & Stop

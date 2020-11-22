@@ -35,6 +35,53 @@ const Context = {
                 this.logger.info("context.getKeys called", { params: ctx.params });
                 return context;
             }
+        },
+        saveToken: {
+            params: {
+                processId: { type: "uuid" },
+                instanceId: { type: "uuid" },
+                elementId: { type: "uuid" },
+                token: { 
+                    type: "object",
+                    props: {
+                        processId: { type: "uuid" },
+                        instanceId: { type: "uuid" },
+                        elementId: { type: "uuid", optional: true },
+                        type: { type: "string" },
+                        status: { type: "string" },
+                        user: { type: "object" },
+                        ownerId: { type: "string" },
+                        attributes: { type: "object", optional: true}
+                    }
+                }
+            },
+            async handler(ctx) {
+                let key = `${ctx.params.processId}-${ctx.params.instanceId}-${ctx.params.elementId}`;
+                if (!context[key]) {
+                    context[key] = {
+                        last: ctx.params.token,
+                        token: [ctx.params.token]
+                    };
+                } else {
+                    context[key].last = ctx.params.token;
+                    context[key].token.push(ctx.params.token);
+                }
+                this.logger.info("token stored", { params: ctx.params } );
+                return true;
+            }
+        },
+        getToken: {
+            params: {
+                processId: { type: "uuid" },
+                instanceId: { type: "uuid" },
+                elementId: { type: "uuid" }
+            },
+            async handler(ctx) {
+                let key = `${ctx.params.processId}-${ctx.params.instanceId}-${ctx.params.elementId}`;
+                if (!context[key]) this.logger.error("Unvalid key", { params: ctx.params });
+                this.logger.info("return result", { status: context[key] } );
+                return context[key];
+            }
         }
     }
 };

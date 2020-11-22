@@ -10,6 +10,7 @@ const Timer = {
                 payload: { type: "object" }
             },
             async handler(ctx) {
+                console.log("Date: " + ctx.params.time + " - type: " + typeof ctx.params.time);
                 this.logger.info("flow.timer.schedule called", { params: ctx.params, meta: ctx.meta } );
                 queue[ctx.event] = {
                     event: ctx.event,

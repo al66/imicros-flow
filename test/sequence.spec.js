@@ -12,7 +12,6 @@ const { ACL, user, ownerId } = require("./helper/acl");
 const { Query, process } = require("./helper/query");
 const { Context, context } = require("./helper/context");
 const { Rules, rule } = require("./helper/rules");
-const { Store, store } = require("./helper/store");
 
 const calls = [];
 const CollectEvents = Object.assign(Collect,{ settings: { calls: calls }});
@@ -31,7 +30,7 @@ describe("Test sequence service", () => {
     });    
     
     // Load services
-    [CollectEvents, Token, Sequence, Context, QueryACL, ACL, Rules, Store].map(service => { return master.createService(service); }); 
+    [CollectEvents, Token, Sequence, Context, QueryACL, ACL, Rules].map(service => { return master.createService(service); }); 
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));
