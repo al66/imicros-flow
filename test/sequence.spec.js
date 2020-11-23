@@ -2,8 +2,8 @@
 
 const { ServiceBroker } = require("moleculer");
 const { Constants } = require("imicros-flow-control");
-const Token = require("../lib/token");
-const Sequence = require("../lib/sequence");
+const { Token } = require("../index");
+const { Sequence } = require("../index");
 const { v4: uuid } = require("uuid");
 
 // helper
