@@ -7,5 +7,6 @@ module.exports = {
     Event: require("./lib/event"),
     Token: require("./lib/token"),
     Next: require("./lib/next"),
-    Sequence: require("./lib/sequence")
+    Sequence: require("./lib/sequence"),
+    Activity: require("./lib/activity")
 };
