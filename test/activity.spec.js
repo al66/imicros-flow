@@ -27,8 +27,8 @@ describe("Test activity service", () => {
             namespace: "token",
             nodeID: nodeID,
             // transporter: "nats://192.168.2.124:4222",
-            // logLevel: "info" //"debug"
-            logger: false 
+            logLevel: "info" //"debug"
+            // logger: false 
         });        
     });    
     

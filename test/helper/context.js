@@ -32,7 +32,7 @@ const Context = {
                 keys: { type: "array", item: "string" }
             },
             handler(ctx) {
-                this.logger.info("context.getKeys called", { params: ctx.params });
+                this.logger.info("context.getKeys called", { params: ctx.params, meta: ctx.meta });
                 return context;
             }
         },
