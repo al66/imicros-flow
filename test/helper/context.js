@@ -10,7 +10,7 @@ const Context = {
                 value: { type: "any" }
             },
             handler(ctx) {
-                this.logger.info("context.add called", { params: ctx.params });
+                this.logger.info("context.add called", { params: ctx.params, meta: ctx.meta });
                 if (!context[ctx.params.instanceId]) context[ctx.params.instanceId] = [];
                 context[ctx.params.instanceId][ctx.params.key] = ctx.params.value;
                 return true;
