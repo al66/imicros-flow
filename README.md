@@ -84,3 +84,12 @@ The process flow of each instance is controlled by token. If a new process eleme
 The token handler is reading the emitted tokens will initiate the next step by processing the token.
 
 If the token is processed, at least the status changes. The processed token is consumed (event `flow.token.consume`) and new tokens are issued.
+
+#### Token flow - activity
+![Alt text](./assets/token-flow-activity.svg)
+<img src="./assets/token-flow-activity.svg">
+(1) ACTIVITY_ACTIVATED
+(2) ACTIVITY_READY
+(3) ACTIVITY_COMPLETED
+(4) ACTIVITY_ERROR
+
