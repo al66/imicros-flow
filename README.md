@@ -89,19 +89,29 @@ If the token is processed, at least the status changes. The processed token is c
 ![Diagram token flow - activity](./assets/token-flow-activity.svg)
 
 (1) ACTIVITY_ACTIVATED
-- Service Task: 
-    - Evaluate ruleset for action parameters
-    - Emit ACTIVITY_READY
-- Others: Emit ACTIVITY_READY
+- Service Task: if a ruleset is given 
+    - get values from context for given input keys
+    - evaluate ruleset for preparation of action parameters
+    - store action parameters in the context
+    - emit token `ACTIVITY_READY`
+- Others: pass through, emit token `ACTIVITY_READY`
 
 (2) ACTIVITY_READY
 - Service Task: 
-    - Call action and save result in context
+    - get values from context for the given parameters key
+    - call given service action and save result in context under the given key for the result
+    - in case of errors: emit token `ACTIVITY_ERROR`
+    - otherwise: emit token `ACTIVITY_COMPLETED`
 - Business Rule Task:
-    - Evaluate ruleset
+    - get values from context for given input keys
+    - evaluate ruleset
+    - store result in the context under the given key
+    - in case of errors: emit token `ACTIVITY_ERROR`
+    - otherwise: emit token `ACTIVITY_COMPLETED`
 
 (3) ACTIVITY_COMPLETED
-- All: Emit *flow.next*
+- All: 
+    - emit `flow.next`
 
 (4) ACTIVITY_ERROR
 
