@@ -85,14 +85,23 @@ The token handler is reading the emitted tokens will initiate the next step by p
 
 If the token is processed, at least the status changes. The processed token is consumed (event `flow.token.consume`) and new tokens are issued.
 
-#### Token flow - activity
+#### Activity
 ![Diagram token flow - activity](./assets/token-flow-activity.svg)
 
 (1) ACTIVITY_ACTIVATED
+- Service Task: 
+    - Evaluate ruleset for action parameters
+    - Emit ACTIVITY_READY
+- Others: Emit ACTIVITY_READY
 
 (2) ACTIVITY_READY
+- Service Task: 
+    - Call action and save result in context
+- Business Rule Task:
+    - Evaluate ruleset
 
 (3) ACTIVITY_COMPLETED
+- All: Emit *flow.next*
 
 (4) ACTIVITY_ERROR
 
