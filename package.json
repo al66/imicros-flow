@@ -54,6 +54,6 @@
     "imicros-flow-control": "^0.0.4",
     "imicros-streams": "^0.0.3",
     "rfdc": "^1.1.4",
-    "uuid": "^8.3.1"
+    "uuid": "^8.3.2"
   }
 }
