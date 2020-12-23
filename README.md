@@ -115,3 +115,35 @@ If the token is processed, at least the status changes. The processed token is c
 
 (4) ACTIVITY_ERROR
 
+#### Sequence
+![Diagram token flow - sequence](./assets/token-flow-sequence.svg)
+
+(1) SEQUENCE_ACTIVATED
+- Standard Sequence:
+    - pass through, emit token `SEQUENCE_COMPLETED`
+- Conditional Sequence:
+    - get values from context for given input keys
+    - evaluate ruleset
+    - if the result for the given result key === true: emit token `SEQUENCE_COMPLETED`
+    - if the result for the given result key != true: emit token `SEQUENCE_REJECTED`
+    - emit `flow.sequence.evaluated`
+- Default Sequence:
+    - do nothing ( waiting for events `flow.sequence.evaluated` )
+
+(2) SEQUENCE_COMPLETED
+
+
+(3) SEQUENCE_REJECTED
+
+(4) SEQUENCE_ERROR
+
+Handle `flow.sequence.evaluated`:
+
+Each token emitted by handling of `flow.next` has the attributes *defaultSequence* and *waitFor*. *defaultSequence* is the element id of an outgoing default sequence. *waitFor* is an array of all outgoing conditional sequences.
+
+The event handler of `flow.sequence.evaluated`
+- save the received token in the context of the default sequence element
+- get all received token saved in the context and check if they are complete against the array *waitFor*
+- if the received token are complete
+    - if all are rejected: emit token `SEQUENCE_COMPLETED`
+    - if any of them is completed: emit token `SEQUENCE_REJECTED`
