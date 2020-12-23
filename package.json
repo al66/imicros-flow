@@ -45,14 +45,13 @@
   "devDependencies": {
     "benchmark": "^2.1.4",
     "imicros-acl": "^0.0.6",
-    "jest": "^25.5.4",
+    "jest": "^26.6.3",
     "moleculer": "^0.14.11",
     "nats": "^1.4.12"
   },
   "dependencies": {
     "cron-parser": "^2.18.0",
-    "imicros-flow-control": "^0.0.4",
-    "imicros-streams": "^0.0.3",
+    "imicros-flow-control": "^0.0.5",
     "rfdc": "^1.1.4",
     "uuid": "^8.3.2"
   }
