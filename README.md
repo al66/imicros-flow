@@ -44,24 +44,24 @@ Event Sub-Process  |         | [ ] Loop <br/> [ ] Parallel <br/> [ ] Sequential 
 Transaction  |         | [ ] Loop <br/> [ ] Parallel <br/> [ ] Sequential <br/> [ ] Compensation
 
 #### Sequence Flow
-- [x] Standard Flow
-- [x] Conditional Flow
-- [x] Default Flow
+-  [x] Standard Flow
+-  [x] Conditional Flow
+-  [x] Default Flow
 
 #### Gateways
-- [x] Exclusive Gateway
-- [x] Event-based Gateway
-- [x] Parallel Gateway
-- [ ] Inclusive Gateway
-- [ ] Complex Gateway
-- [ ] Exclusive Event-based Gateway
-- [ ] Parallel Event-based Gateway
+-  [x] Exclusive Gateway
+-  [x] Event-based Gateway
+-  [x] Parallel Gateway
+-  [ ] Inclusive Gateway
+-  [ ] Complex Gateway
+-  [ ] Exclusive Event-based Gateway
+-  [ ] Parallel Event-based Gateway
 
 #### Events
 
 Events         | Start                    | Intermediate             | End
 -------------- | ------------------------ | ------------------------ | ------------------------
-None (untyped) | [x] Standard  | [ ] Throwing | [ ] Standard <br/> [ ] Terminate Immediatly
+None (untyped) | [ ] Standard  | [ ] Throwing | [ ] Standard <br/> [ ] Terminate Immediatly
 Message        | [ ] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting <br/> [ ] Throwing | [ ] Standard
 Timer (1)      | [x] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [x] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | 
 Escalation     | [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting  [ ] Throwing | [ ] Standard
@@ -69,7 +69,7 @@ Conditional    | [ ] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary
 Error          | [ ] Boundary Interrupting | [ ] Boundary Interrupting | [ ] Standard
 Cancel         |  | [ ] Boundary Interrupting | [ ] Standard
 Compensation   | [ ] Boundary Interrupting | [ ] Boundary Interrupting <br/> [ ] Throwing | [ ] Standard
-Signal         | [ ] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting <br/> [ ] Throwing | [ ] Standard
+Signal         | [x] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting <br/> [ ] Throwing | [ ] Standard
 Multiple       | [ ] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting <br/> [ ] Throwing | [ ] Standard
 Parallel Multiple  | [ ] Standard <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | [ ] Catching <br/> [ ] Boundary Interrupting <br/> [ ] Boundary Non-Interrupting | 
 
@@ -131,19 +131,20 @@ If the token is processed, at least the status changes. The processed token is c
     - do nothing ( waiting for events `flow.sequence.evaluated` )
 
 (2) SEQUENCE_COMPLETED
-
+- All: 
+    - emit `flow.next`
 
 (3) SEQUENCE_REJECTED
 
+
 (4) SEQUENCE_ERROR
 
-Handle `flow.sequence.evaluated`:
+(a) `flow.sequence.evaluated`
 
-Each token emitted by handling of `flow.next` has the attributes *defaultSequence* and *waitFor*. *defaultSequence* is the element id of an outgoing default sequence. *waitFor* is an array of all outgoing conditional sequences.
+Each token emitted by handling of `flow.next` has the attributes *defaultSequence* and *waitFor* if one of the outgoing sequences is a default sequence. *defaultSequence* is the element id of an outgoing default sequence. *waitFor* is an array of all outgoing conditional sequences.
 
 The event handler of `flow.sequence.evaluated`
 - save the received token in the context of the default sequence element
 - get all received token saved in the context and check if they are complete against the array *waitFor*
-- if the received token are complete
-    - if all are rejected: emit token `SEQUENCE_COMPLETED`
-    - if any of them is completed: emit token `SEQUENCE_REJECTED`
+- if the received token are complete and all are rejected: emit token `SEQUENCE_COMPLETED`
+- if the received token are complete and any of them is completed: emit token `SEQUENCE_REJECTED`

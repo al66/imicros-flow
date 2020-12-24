@@ -12,8 +12,8 @@
    viewBox="0 0 89.815971 96.121872"
    version="1.1"
    id="svg745"
-   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
-   sodipodi:docname="token-flow-sequence.svg">
+   sodipodi:docname="token-flow-sequence.svg"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)">
   <defs
      id="defs739">
     <marker
@@ -89,9 +89,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.35"
+     inkscape:zoom="2"
      inkscape:cx="169.73097"
-     inkscape:cy="418.7905"
+     inkscape:cy="178.7905"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -100,11 +100,11 @@
      fit-margin-left="5"
      fit-margin-bottom="5"
      fit-margin-right="5"
-     inkscape:window-width="1313"
-     inkscape:window-height="1030"
-     inkscape:window-x="96"
-     inkscape:window-y="0"
-     inkscape:window-maximized="0" />
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata742">
     <rdf:RDF>
@@ -597,13 +597,13 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777px;line-height:1.25;font-family:Arial, sans-serif;-inkscape-font-specification:'Arial, sans-serif';fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583"
        x="110.02258"
-       y="113.46845"
+       y="112.93929"
        id="text244-7"><tspan
          sodipodi:role="line"
          id="tspan242-1"
          x="110.02258"
-         y="113.46845"
-         style="stroke-width:0.264583">1</tspan></text>
+         y="112.93929"
+         style="stroke-width:0.264583">a</tspan></text>
     <circle
        style="fill:#ff0000;fill-rule:evenodd;stroke-width:0.264583"
        id="circle234-0"
@@ -621,5 +621,39 @@
          x="123.33993"
          y="117.17262"
          style="stroke-width:0.264583">2</tspan></text>
+    <circle
+       style="fill:#0000ff;fill-rule:evenodd;stroke-width:0.264583"
+       id="circle945"
+       cx="113.85902"
+       cy="89.986679"
+       r="2.1828125" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777px;line-height:1.25;font-family:Arial, sans-serif;-inkscape-font-specification:'Arial, sans-serif';fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="112.8007"
+       y="90.714294"
+       id="text949"><tspan
+         sodipodi:role="line"
+         id="tspan947"
+         x="112.8007"
+         y="90.714294"
+         style="stroke-width:0.264583">a</tspan></text>
+    <circle
+       style="fill:#0000ff;fill-rule:evenodd;stroke-width:0.264583"
+       id="circle951"
+       cx="126.95589"
+       cy="89.986679"
+       r="2.1828125" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777px;line-height:1.25;font-family:Arial, sans-serif;-inkscape-font-specification:'Arial, sans-serif';fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="125.89758"
+       y="90.714294"
+       id="text955"><tspan
+         sodipodi:role="line"
+         id="tspan953"
+         x="125.89758"
+         y="90.714294"
+         style="stroke-width:0.264583">a</tspan></text>
   </g>
 </svg>
