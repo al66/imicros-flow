@@ -1,5 +1,10 @@
 // mock service flow.context
 let context = {};
+
+function setContext (c) {
+    context = c;
+}
+
 const Context = {
     name: "flow.context",
     actions: {
@@ -88,5 +93,6 @@ const Context = {
 
 module.exports = {
     context: context,
-    Context: Context
+    Context: Context,
+    setContext
 };

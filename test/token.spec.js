@@ -4,6 +4,7 @@ const { ServiceBroker } = require("moleculer");
 const { Constants } = require("imicros-flow-control");
 const Token = require("../lib/token");
 const Sequence = require("../lib/sequence");
+const Event = require("../lib/event");
 const { v4: uuid } = require("uuid");
 
 // helper
@@ -28,7 +29,7 @@ describe("Test token service", () => {
     
     
      // Load services
-    [CollectEvents, Token, Sequence].map(service => { return master.createService(service); }); 
+    [CollectEvents, Token, Sequence, Event].map(service => { return master.createService(service); }); 
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));
@@ -49,10 +50,9 @@ describe("Test token service", () => {
             .delay(10)
             .then(() => {
                 // console.log(calls);
-                expect(calls["flow.token.emit"]).toHaveLength(1);
+                expect(calls["flow.token.emit"]).toHaveLength(2);
                 expect(calls["flow.token.emit"].filter(o => o.payload.token == token)).toHaveLength(1);
-                expect(calls["flow.event.activated"]).toHaveLength(1);
-                expect(calls["flow.event.activated"].filter(o => o.payload.token == token)).toHaveLength(1);
+                expect(calls["flow.token.emit"].filter(o => o.payload.token.status == Constants.EVENT_OCCURED)).toHaveLength(1);
             }); 
     });
 
@@ -71,8 +71,8 @@ describe("Test token service", () => {
             .delay(10)
             .then(() => {
                 // console.log(calls);
-                expect(calls["flow.sequence.activated"]).toHaveLength(1);
-                expect(calls["flow.sequence.activated"].filter(o => o.payload.token == token)).toHaveLength(1);
+                // expect(calls["flow.sequence.activated"]).toHaveLength(1);
+                // expect(calls["flow.sequence.activated"].filter(o => o.payload.token == token)).toHaveLength(1);
                 // calls["flow.token.emit"].map(o => console.log(o.payload));
                 expect(calls["flow.token.emit"].filter(o => o.payload.token.status == Constants.SEQUENCE_COMPLETED)).toHaveLength(1);
             }); 

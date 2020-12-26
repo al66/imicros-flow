@@ -148,3 +148,11 @@ The event handler of `flow.sequence.evaluated`
 - get all received token saved in the context and check if they are complete against the array *waitFor*
 - if the received token are complete and all are rejected: emit token `SEQUENCE_COMPLETED`
 - if the received token are complete and any of them is completed: emit token `SEQUENCE_REJECTED`
+
+#### Sequence
+![Diagram token flow - exclusive gateway](./assets/token-flow-exclusive-gateway.svg)
+
+(1) GATEWAY_ACTIVATED
+
+(2) GATEWAY_COMPLETED
+

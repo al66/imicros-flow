@@ -55,8 +55,8 @@ describe("Test sequence service", () => {
         return master.emit("flow.token.emit", { token })
             .delay(10)
             .then(() => {
-                // calls["flow.token.emit"].map(o => console.log(o.payload));
-                expect(calls["flow.token.emit"].filter(o => o.payload.token.status == Constants.GATEWAY_COMPLETED)).toHaveLength(1);
+                calls["flow.token.emit"].map(o => console.log(o.payload));
+                expect(calls["flow.token.emit"].filter(o => o.payload.token.status == Constants.GATEWAY_COMPLETED && o.payload.token.attributes.exclusiveGateway === true)).toHaveLength(1);
             }); 
     });
 
