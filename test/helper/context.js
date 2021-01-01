@@ -45,7 +45,7 @@ const Context = {
             params: {
                 processId: { type: "uuid" },
                 instanceId: { type: "uuid" },
-                elementId: { type: "uuid" },
+                elementId: { type: "uuid", optional: true },
                 token: { 
                     type: "object",
                     props: {
@@ -61,7 +61,10 @@ const Context = {
                 }
             },
             async handler(ctx) {
-                let key = `${ctx.params.processId}-${ctx.params.instanceId}-${ctx.params.elementId}`;
+                let key = `${ctx.params.processId}-${ctx.params.instanceId}`;
+                if (ctx.params.elementId) {
+                    key = `${ctx.params.processId}-${ctx.params.instanceId}-${ctx.params.elementId}`;
+                }
                 if (!context[key]) {
                     context[key] = {
                         last: ctx.params.token,
@@ -75,15 +78,52 @@ const Context = {
                 return true;
             }
         },
+        removeToken: {
+            params: {
+                processId: { type: "uuid" },
+                instanceId: { type: "uuid" },
+                elementId: { type: "uuid", optional: true },
+                token: { 
+                    type: "object",
+                    props: {
+                        processId: { type: "uuid" },
+                        instanceId: { type: "uuid" },
+                        elementId: { type: "uuid", optional: true },
+                        type: { type: "string" },
+                        status: { type: "string" },
+                        user: { type: "object" },
+                        ownerId: { type: "string" },
+                        attributes: { type: "object", optional: true}
+                    }
+                }
+            },
+            async handler(ctx) {
+                let key = `${ctx.params.processId}-${ctx.params.instanceId}`;
+                if (ctx.params.elementId) {
+                    key = `${ctx.params.processId}-${ctx.params.instanceId}-${ctx.params.elementId}`;
+                }
+                if (context[key] && context[key].token) {
+                    context[key].token = context[key].token.filter((token) => { return token !== ctx.params.token; });
+                }
+                this.logger.info("token removed", { params: ctx.params } );
+                return true;
+            }
+        },
         getToken: {
             params: {
                 processId: { type: "uuid" },
                 instanceId: { type: "uuid" },
-                elementId: { type: "uuid" }
+                elementId: { type: "uuid", optional: true }
             },
             async handler(ctx) {
-                let key = `${ctx.params.processId}-${ctx.params.instanceId}-${ctx.params.elementId}`;
-                if (!context[key]) this.logger.error("Unvalid key", { params: ctx.params });
+                let key = `${ctx.params.processId}-${ctx.params.instanceId}`;
+                if (ctx.params.elementId) {
+                    key = `${ctx.params.processId}-${ctx.params.instanceId}-${ctx.params.elementId}`;
+                }
+                if (!context[key]) {
+                    this.logger.debug("unkown key", { params: ctx.params });
+                    return { token: [] };
+                }
                 this.logger.info("return result", { status: context[key] } );
                 return context[key];
             }

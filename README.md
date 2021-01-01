@@ -119,9 +119,9 @@ If the token is processed, at least the status changes. The processed token is c
 ![Diagram token flow - sequence](./assets/token-flow-sequence.svg)
 
 (1) SEQUENCE_ACTIVATED
-- Standard Sequence:
+- Standard Sequence (and received token without attribute `exclusiveGateway`):
     - pass through, emit token `SEQUENCE_COMPLETED`
-- Conditional Sequence:
+- Conditional Sequence or received token with attribute `exclusiveGateway`:
     - get values from context for given input keys
     - evaluate ruleset
     - if the result for the given result key === true: emit token `SEQUENCE_COMPLETED`
@@ -141,7 +141,7 @@ If the token is processed, at least the status changes. The processed token is c
 
 (a) `flow.sequence.evaluated`
 
-Each token emitted by handling of `flow.next` has the attributes *defaultSequence* and *waitFor* if one of the outgoing sequences is a default sequence. *defaultSequence* is the element id of an outgoing default sequence. *waitFor* is an array of all outgoing conditional sequences.
+Each token emitted by handling of `flow.next` has the attributes *defaultSequence* and *waitFor* if one of the outgoing sequences is a default sequence. *defaultSequence* is the element id of an outgoing default sequence. *waitFor* is an array of all other outgoing sequences.
 
 The event handler of `flow.sequence.evaluated`
 - save the received token in the context of the default sequence element
@@ -149,10 +149,17 @@ The event handler of `flow.sequence.evaluated`
 - if the received token are complete and all are rejected: emit token `SEQUENCE_COMPLETED`
 - if the received token are complete and any of them is completed: emit token `SEQUENCE_REJECTED`
 
-#### Sequence
+#### Gateway
 ![Diagram token flow - exclusive gateway](./assets/token-flow-exclusive-gateway.svg)
 
 (1) GATEWAY_ACTIVATED
+- split:
+    - set attribute `exclusiveGateway` in new token for flow control by outgoing sequences
+    - emit token `GATEWAY_COMPLETED`
+- merge:
+    - pass through, emit token `GATEWAY_COMPLETED`
 
 (2) GATEWAY_COMPLETED
+- split & merge:
+    - emit `flow.next`
 

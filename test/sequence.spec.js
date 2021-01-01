@@ -2,8 +2,8 @@
 
 const { ServiceBroker } = require("moleculer");
 const { Constants } = require("imicros-flow-control");
-const { Token } = require("../index");
 const { Sequence } = require("../index");
+const { Next } = require("../index");
 const { v4: uuid } = require("uuid");
 
 // helper
@@ -25,13 +25,14 @@ describe("Test sequence service", () => {
             namespace: "token",
             nodeID: nodeID,
             // transporter: "nats://192.168.2.124:4222",
-            // logLevel: "info" //"debug"
-            logger: false 
+            logLevel: "debug"
+            // logLevel: "info"
+            //logger: false 
         });        
     });    
     
     // Load services
-    [CollectEvents, Token, Sequence, Context, QueryACL, ACL, Rules, Feel].map(service => { return master.createService(service); }); 
+    [CollectEvents, Sequence, Next, Context, QueryACL, ACL, Rules, Feel].map(service => { return master.createService(service); }); 
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));
@@ -63,9 +64,15 @@ describe("Test sequence service", () => {
             user: user,
             ownerId: ownerId
         };
+        process.current = {
+            processId: token.processId,
+            elementId: token.elementId,
+            type: token.type
+        };
         return master.emit("flow.token.emit", { token })
             .delay(10)
             .then(() => {
+                console.log(calls);
                 expect(calls["flow.token.emit"].filter(o => o.payload.token.status == Constants.SEQUENCE_COMPLETED)).toHaveLength(1);
             }); 
     });
@@ -99,7 +106,7 @@ describe("Test sequence service", () => {
             myRule: true
         };
         return master.emit("flow.token.emit", { token })
-            .delay(20)
+            .delay(10)
             .then(() => {
                 // console.log(calls);
                 // calls["flow.token.emit"].map(o => console.log(o.payload));
@@ -138,7 +145,7 @@ describe("Test sequence service", () => {
         };
         setContext({ a: 1, b: 2 });
         return master.emit("flow.token.emit", { token })
-            .delay(20)
+            .delay(10)
             .then(() => {
                 expect(calls["flow.sequence.evaluated"]).toHaveLength(1);
                 expect(calls["flow.sequence.evaluated"][0].payload.token.attributes.defaultSequence).toEqual(token.attributes.defaultSequence);
@@ -173,7 +180,7 @@ describe("Test sequence service", () => {
         };
         setContext({ a: 1, b: 2 });
         return master.emit("flow.token.emit", { token })
-            .delay(20)
+            .delay(10)
             .then(() => {
                 expect(calls["flow.sequence.evaluated"]).toHaveLength(0);
                 expect(calls["flow.token.emit"].filter(o => o.payload.token.processId == token.processId && o.payload.token.status == Constants.SEQUENCE_COMPLETED)).toHaveLength(1);
@@ -197,7 +204,7 @@ describe("Test sequence service", () => {
             }
         };
         return master.emit("flow.sequence.evaluated", { token })
-            .delay(20)
+            .delay(10)
             .then(() => {
                 // console.log(store);
                 // expect(calls["flow.sequence.evaluated"].filter(o => o.payload.token == token)).toHaveLength(1);

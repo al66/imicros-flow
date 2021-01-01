@@ -2,8 +2,8 @@
 
 const { ServiceBroker } = require("moleculer");
 const { Constants } = require("imicros-flow-control");
-const { Token } = require("../index");
 const { Event } = require("../index");
+const { Next } = require("../index");
 const { v4: uuid } = require("uuid");
 
 // helper & mocks
@@ -30,7 +30,7 @@ describe("Test activity service", () => {
     });    
     
     // Load services
-    [CollectEvents, Token, Event, Context, QueryACL, ACL, Timer].map(service => { return master.createService(service); }); 
+    [CollectEvents, Event, Next, Context, QueryACL, ACL, Timer].map(service => { return master.createService(service); }); 
     // const [collect, token, activity, query] = [CollectEvents, Token, Activity, Query].map(service => { return master.createService(service); }); 
 
     // Start & Stop

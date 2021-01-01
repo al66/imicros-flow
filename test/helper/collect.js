@@ -19,7 +19,20 @@ function clear(calls) {
     }
 }
 
+const LogActions = ({ actions }) => {
+    return {
+        // wrap local action - call acl 
+        localAction(next, action) {
+            return async function(ctx) {
+                actions.push({ action, params: ctx.params, meta: ctx.meta });
+                return next(ctx);
+            };
+        }
+    };
+};
+
 module.exports = {
     Collect: Collect,
+    LogActions,
     clear: clear
 };

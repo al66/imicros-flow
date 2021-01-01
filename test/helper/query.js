@@ -1,3 +1,5 @@
+const _ = require("../../lib/util/lodash");
+
 const process = {};
 const subscriptions = [];
 
@@ -6,6 +8,7 @@ const Query = {
     name: "flow.query",
     actions: {
         getTask: {
+            acl: "before",
             params: {
                 processId: { type: "uuid" },
                 elementId: { type: "uuid" }
@@ -71,7 +74,9 @@ const Query = {
             async handler(ctx) {
                 this.logger.info("query.next called", { params: ctx.params, meta: ctx.meta, process: process } );
                 if (ctx.meta.ownerId !== this.ownerId) return false;
-                return process.next;
+                let next = _.cloneDeep(process.next);
+                process.next = [];
+                return next;
             }
         },
         previous: {

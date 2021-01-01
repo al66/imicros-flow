@@ -2,19 +2,21 @@
 
 const { ServiceBroker } = require("moleculer");
 const { Constants } = require("imicros-flow-control");
-const { Token } = require("../index");
+const { AclMiddleware } = require("imicros-acl");
 const { Activity } = require("../index");
+const { Next } = require("../index");
 const { v4: uuid } = require("uuid");
 
 // helper & mocks
-const { Collect } = require("./helper/collect");
+const { Collect, LogActions } = require("./helper/collect");
 const { Query, process } = require("./helper/query");
 const { Context, context } = require("./helper/context");
-const { ACL, user, ownerId, serviceToken } = require("./helper/acl");
+const { ACL, user, ownerId, serviceToken, accessToken } = require("./helper/acl");
 const { Test, call } = require("./helper/action");
 const { Rules, rule } = require("./helper/rules");
 
 const calls = [];
+const actions = [];
 const CollectEvents = Object.assign(Collect,{ settings: { calls: calls }});
 const QueryACL = Object.assign(Query,{ settings: { ownerId: ownerId }});
 
@@ -26,14 +28,15 @@ describe("Test activity service", () => {
         return new ServiceBroker({
             namespace: "token",
             nodeID: nodeID,
+            middlewares: [LogActions({ actions }, AclMiddleware({ service: "acl" }))],
             // transporter: "nats://192.168.2.124:4222",
-            logLevel: "info" //"debug"
-            // logger: false 
+            // logLevel: "info" //"debug"
+            logger: false 
         });        
     });    
     
     // Load services
-    [CollectEvents, Token, Activity, Context, QueryACL, ACL, Test, Rules].map(service => { return master.createService(service); }); 
+    [CollectEvents, Activity, Next, Context, QueryACL, ACL, Test, Rules].map(service => { return master.createService(service); }); 
     // const [collect, token, activity, query] = [CollectEvents, Token, Activity, Query].map(service => { return master.createService(service); }); 
 
     // Start & Stop
@@ -68,7 +71,55 @@ describe("Test activity service", () => {
         return master.emit("flow.token.emit", { token })
             .delay(10)
             .then(() => {
+                console.log(actions);
                 // console.log(calls);
+                expect(calls["flow.token.emit"].filter(o => o.payload.token.status == Constants.ACTIVITY_READY)).toHaveLength(1);
+                
+                // 2 times call to getTask: action prepare & action execute
+                let getTask = actions.filter(a => a.action.name === "flow.query.getTask");
+                expect(getTask).toHaveLength(2);
+                // expect both times correct meta data
+                expect(getTask[0].meta).toMatchObject({
+                    serviceToken: serviceToken,
+                    ownerId: ownerId,
+                    user: user,
+                    acl: {
+                        accessToken: accessToken
+                    }
+                });
+                expect(getTask[1].meta).toMatchObject({
+                    serviceToken: serviceToken,
+                    ownerId: ownerId,
+                    user: user,
+                    acl: {
+                        accessToken: accessToken
+                    }
+                });
+
+                // 2 times call to requestAccess: action prepare & action execute
+                let requestAccess = actions.filter(a => a.action.name === "acl.requestAccess");
+                expect(requestAccess[0]).toMatchObject({
+                    params: {
+                        forGroupId: ownerId
+                    },
+                    meta: {
+                        serviceToken: serviceToken,
+                        user: user
+                    }
+                });
+                expect(requestAccess[1]).toMatchObject({
+                    params: {
+                        forGroupId: ownerId
+                    },
+                    meta: {
+                        serviceToken: serviceToken,
+                        user: user
+                    }
+                });
+                
+            
+                expect(calls["flow.token.consume"].filter(o => o.payload.token.status == Constants.ACTIVITY_READY)).toHaveLength(1);
+                
                 //expect(calls["flow.activity.activated"]).toHaveLength(1);
                 // expect(calls["flow.activity.activated"].filter(o => o.payload.token == token)).toHaveLength(1);
                 // calls["flow.token.emit"].map(o => console.log(o.payload));
@@ -103,7 +154,7 @@ describe("Test activity service", () => {
             a: "test"
         };
         return master.emit("flow.token.emit", { token })
-            .delay(20)
+            .delay(10)
             .then(() => {
                 // console.log(calls);
                 // expect(calls["flow.activity.activated"]).toHaveLength(2);

@@ -44,7 +44,7 @@
   ],
   "devDependencies": {
     "benchmark": "^2.1.4",
-    "imicros-acl": "^0.0.6",
+    "imicros-acl": "0.0.6",
     "jest": "^26.6.3",
     "js-feel": "^1.4.7",
     "moleculer": "^0.14.11",

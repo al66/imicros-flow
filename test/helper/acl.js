@@ -33,7 +33,7 @@ const ACL = {
             },			
             async handler(ctx) {
                 this.logger.info("acl.requestAccess called", { params: ctx.params, meta: ctx.meta } );
-                if (ctx.meta.user === meta.user && ctx.meta.ownerId === meta.ownerId && ctx.meta.serviceToken === serviceToken) return { token: accessToken }; 
+                if (ctx.meta.user.id === meta.user.id && ( ctx.meta.ownerId === meta.ownerId || ctx.meta.serviceToken === serviceToken)) return { token: accessToken }; 
                 return false;
             }
         },
@@ -43,14 +43,18 @@ const ACL = {
             },
             async handler(ctx) {
                 this.logger.info("acl.verified called", { params: ctx.params, meta: ctx.meta } );
-                return { 
-                    acl: {
-                        accessToken: ctx.params.token,
-                        ownerId: ctx.meta.ownerId,
-                        role: "admin",
-                        unrestricted: true
-                    } 
-                };
+                if ( ctx.params.token === accessToken ) {
+                    return { 
+                        acl: {
+                            accessToken: ctx.params.token,
+                            ownerId: ctx.meta.ownerId,
+                            role: "admin",
+                            unrestricted: true
+                        } 
+                    };
+                } else {
+                    throw new Error("acl.verified failed", { params: ctx.params, meta: ctx.meta });
+                } 
             }
         }
     }

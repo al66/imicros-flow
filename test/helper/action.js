@@ -5,6 +5,7 @@ const Test = {
     name: "test",
     actions: {
         actionA: {
+            acl: "before",
             params: {
                 a: { type: "string" }
             },
