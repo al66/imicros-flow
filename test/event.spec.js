@@ -42,6 +42,7 @@ describe("Test activity service", () => {
     it("it should trigger events for subscriptions",() => {
         let s1 = {
             processId: uuid(),
+            versionId: uuid(),
             elementId: uuid(),
             ownerId: ownerId,
             type: Constants.DEFAULT_EVENT
@@ -60,6 +61,7 @@ describe("Test activity service", () => {
     it("it should activate timer of intermediate event",() => {
         let token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: uuid(),
             type: Constants.TIMER_EVENT,
@@ -74,6 +76,7 @@ describe("Test activity service", () => {
         time.setMinutes(time.getUTCMinutes() + 12);
         process.current = {
             processId: token.processId,
+            versionId: token.versionId,
             elementId: token.elementId,
             type: token.type,
             attributes: {
@@ -96,6 +99,7 @@ describe("Test activity service", () => {
     it("it should emit event occured",() => {
         let token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: uuid(),
             type: Constants.TIMER_EVENT,
@@ -115,6 +119,7 @@ describe("Test activity service", () => {
     it("it should schedule first",() => {
         let event = {
             processId: uuid(),
+            versionId: uuid(),
             id: uuid(),
             name: "any",
             type: Constants.TIMER_EVENT,
@@ -148,6 +153,7 @@ describe("Test activity service", () => {
     it("it should emit occured and schedule next",() => {
         let token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: uuid(),
             type: Constants.TIMER_EVENT,

@@ -45,6 +45,7 @@ describe("Test sequence service", () => {
     it("it should emit new token with status GATEWAY_COMPLETED",() => {
         let token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: uuid(),
             type: Constants.EXCLUSIVE_GATEWAY,
@@ -68,6 +69,7 @@ describe("Test sequence service", () => {
         const [ s1, s2, s3 ] = [uuid(), uuid(), uuid()];
         const token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: uuid(),
             type: Constants.PARALLEL_GATEWAY,
@@ -82,9 +84,9 @@ describe("Test sequence service", () => {
             };
             return t;
         });
-        process.previous = [{ processId: token1.processId, uid: s1, type: Constants.SEQUENCE_STANDARD },
-                            { processId: token1.processId, uid: s2, type: Constants.SEQUENCE_CONDITIONAL },
-                            { processId: token1.processId, uid: s3, type: Constants.SEQUENCE_DEFAULT }];
+        process.previous = [{ processId: token1.processId, versionId: token1.versionId, uid: s1, type: Constants.SEQUENCE_STANDARD },
+                            { processId: token1.processId, versionId: token1.versionId, uid: s2, type: Constants.SEQUENCE_CONDITIONAL },
+                            { processId: token1.processId, versionId: token1.versionId, uid: s3, type: Constants.SEQUENCE_DEFAULT }];
         return master.emit("flow.token.emit", { token: token1 })
             .delay(10)
             .then(() => {
@@ -113,6 +115,7 @@ describe("Test sequence service", () => {
     it("it should emit callback token with status GATEWAY_COMPLETED",() => {
         let token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: uuid(),
             type: Constants.EVENT_BASED_GATEWAY,

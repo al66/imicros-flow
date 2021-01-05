@@ -57,6 +57,7 @@ describe("Test sequence service", () => {
     it("it should emit new token with status SEQUENCE_COMPLETED",() => {
         let token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: uuid(),
             type: Constants.SEQUENCE_STANDARD,
@@ -66,6 +67,7 @@ describe("Test sequence service", () => {
         };
         process.current = {
             processId: token.processId,
+            versionId: token.versionId,
             elementId: token.elementId,
             type: token.type
         };
@@ -81,6 +83,7 @@ describe("Test sequence service", () => {
         let sequenceId = uuid();
         let token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: sequenceId,
             type: Constants.SEQUENCE_CONDITIONAL,
@@ -94,6 +97,7 @@ describe("Test sequence service", () => {
         };
         process.current = {
             processId: token.processId,
+            versionId: token.versionId,
             elementId: token.elementId,
             type: token.type,
             attributes: {
@@ -123,6 +127,7 @@ describe("Test sequence service", () => {
         let sequenceId = uuid();
         let token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: sequenceId,
             type: Constants.SEQUENCE_CONDITIONAL,
@@ -136,6 +141,7 @@ describe("Test sequence service", () => {
         };
         process.current = {
             processId: token.processId,
+            versionId: token.versionId,
             elementId: token.elementId,
             type: token.type,
             attributes: {
@@ -159,6 +165,7 @@ describe("Test sequence service", () => {
         let sequenceId = uuid();
         let token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: sequenceId,
             type: Constants.SEQUENCE_STANDARD,
@@ -171,6 +178,7 @@ describe("Test sequence service", () => {
         };
         process.current = {
             processId: token.processId,
+            versionId: token.versionId,
             elementId: token.elementId,
             type: token.type,
             attributes: {
@@ -192,6 +200,7 @@ describe("Test sequence service", () => {
         let sequenceId = uuid();
         let token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: sequenceId,
             type: Constants.SEQUENCE_CONDITIONAL,

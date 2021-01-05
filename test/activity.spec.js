@@ -46,6 +46,7 @@ describe("Test activity service", () => {
     it("it should execute service task",() => {
         let token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: uuid(),
             type: Constants.SERVICE_TASK,
@@ -55,6 +56,7 @@ describe("Test activity service", () => {
         };
         process.current = {
             processId: token.processId,
+            versionId: token.versionId,
             elementId: token.elementId,
             type: token.type,
             attributes: {
@@ -133,6 +135,7 @@ describe("Test activity service", () => {
     it("it should evaluate ruleset and emit activity completed token", () => {
         let token = {
             processId: uuid(),
+            versionId: uuid(),
             instanceId: uuid(),
             elementId: uuid(),
             type: Constants.BUSINESS_RULE_TASK,
@@ -142,6 +145,7 @@ describe("Test activity service", () => {
         };
         process.current = {
             processId: token.processId,
+            versionId: token.versionId,
             elementId: token.elementId,
             type: token.type,
             attributes: {
