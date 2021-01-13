@@ -1,8 +1,8 @@
 // mock service flow.context
 let context = {};
 
-function setContext (c) {
-    context = c;
+function setContext (instanceId, c) {
+    context[instanceId] = c;
 }
 
 const Context = {
@@ -38,7 +38,7 @@ const Context = {
             },
             handler(ctx) {
                 this.logger.info("context.getKeys called", { params: ctx.params, meta: ctx.meta });
-                return context;
+                return context[ctx.params.instanceId];
             }
         },
         saveToken: {

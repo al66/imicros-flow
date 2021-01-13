@@ -53,6 +53,7 @@
   "dependencies": {
     "cron-parser": "^2.18.0",
     "imicros-flow-control": "^0.0.5",
+    "imicros-flow-map": "0.0.1",
     "rfdc": "^1.1.4",
     "uuid": "^8.3.2"
   }

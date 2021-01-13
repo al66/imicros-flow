@@ -149,7 +149,7 @@ describe("Test sequence service", () => {
                 feel: "a + b = 3"
             }
         };
-        setContext({ a: 1, b: 2 });
+        setContext(token.instanceId, { a: 1, b: 2 });
         return master.emit("flow.token.emit", { token })
             .delay(10)
             .then(() => {
