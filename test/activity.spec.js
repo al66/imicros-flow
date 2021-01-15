@@ -193,6 +193,7 @@ describe("Test activity service", () => {
             attributes: {
                 action: "test.actionA",
                 contextKeys: ["inKey"],
+                prepFunction: "template",
                 template: JSON.stringify({ a: "{{inKey}}"}),
                 paramsKey: "myKey",
                 resultKey: "actionA"
