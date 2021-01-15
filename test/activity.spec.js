@@ -185,6 +185,7 @@ describe("Test activity service", () => {
             user: user,
             ownerId: ownerId
         };
+        let template = Buffer.from(JSON.stringify({ a: "{{inKey}}"})).toString("base64");
         process.current = {
             processId: token.processId,
             versionId: token.versionId,
@@ -194,7 +195,7 @@ describe("Test activity service", () => {
                 action: "test.actionA",
                 contextKeys: ["inKey"],
                 prepFunction: "template",
-                template: JSON.stringify({ a: "{{inKey}}"}),
+                template,
                 paramsKey: "myKey",
                 resultKey: "actionA"
             }
