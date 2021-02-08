@@ -57,9 +57,10 @@ const Query = {
             }
         },
         subscriptions: {
-            acl: "before",
+            visibility: "public",
             params: {
                 eventName: { type: "string" },
+                ownerId: { type: "string" },
                 version: { type: "string", optional: true },
                 id: { type: "string", optional: true },
                 processId: { type: "uuid", optional: true },
