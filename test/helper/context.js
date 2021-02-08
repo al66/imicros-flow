@@ -9,6 +9,7 @@ const Context = {
     name: "flow.context",
     actions: {
         add: {
+            acl: "before",
             params: {
                 instanceId: { type: "uuid" },
                 key: { type: "string" },
@@ -22,6 +23,7 @@ const Context = {
             }
         },
         get: {
+            acl: "before",
             params: {
                 instanceId: { type: "uuid" },
                 key: { type: "string" }
@@ -32,6 +34,7 @@ const Context = {
             }
         },
         getKeys: {
+            acl: "before",
             params: {
                 instanceId: { type: "uuid" },
                 keys: { type: "array", item: "string" }
@@ -42,6 +45,7 @@ const Context = {
             }
         },
         saveToken: {
+            acl: "before",
             params: {
                 processId: { type: "uuid" },
                 instanceId: { type: "uuid" },
@@ -79,6 +83,7 @@ const Context = {
             }
         },
         removeToken: {
+            acl: "before",
             params: {
                 processId: { type: "uuid" },
                 instanceId: { type: "uuid" },
@@ -110,6 +115,7 @@ const Context = {
             }
         },
         getToken: {
+            acl: "before",
             params: {
                 processId: { type: "uuid" },
                 instanceId: { type: "uuid" },

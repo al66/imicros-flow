@@ -4,6 +4,7 @@ const Rules = {
     name: "rules",
     actions: {
         eval: {
+            acl: "before",
             params: {
                 name: [{ type: "string" },{ type: "array" }],
                 data: { type: "object" }

@@ -10,15 +10,17 @@ const _ = require("../lib/util/lodash");
 
 // helper
 const { Collect, LogActions, clear } = require("./helper/collect");
-const { ACL, user, ownerId } = require("./helper/acl");
+const { ACL, user } = require("./helper/acl");
 const { Query, process } = require("./helper/query");
 const { Context, context } = require("./helper/context");
 const { Rules, rule } = require("./helper/rules");
+const { Agents } = require("./helper/agents");
+const { credentials } = require("./helper/credentials");
 
 const calls = [];
 const actions = [];
 const CollectEvents = Object.assign(Collect,{ settings: { calls: calls }});
-const QueryACL = Object.assign(Query,{ settings: { ownerId: ownerId }});
+const ownerId = credentials.ownerId;
 
 describe("Test sequence service", () => {
 
@@ -28,13 +30,13 @@ describe("Test sequence service", () => {
             nodeID: nodeID,
             middlewares: [LogActions({ actions }), AclMiddleware({ service: "acl" })],
             // transporter: "nats://192.168.2.124:4222",
-            // logLevel: "info" //"debug"
-            logger: false 
+            logLevel: "info", //"debug"
+            logger: true 
         });        
     });    
     
     // Load services
-    [CollectEvents, Gateway, Next, Context, QueryACL, ACL, Rules].map(service => { return master.createService(service); }); 
+    [CollectEvents, Gateway, Next, Context, Query, ACL, Agents, Rules].map(service => { return master.createService(service); }); 
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));
@@ -90,6 +92,7 @@ describe("Test sequence service", () => {
         return master.emit("flow.token.emit", { token: token1 })
             .delay(10)
             .then(() => {
+                expect(calls["flow.token.emit"].filter(o => o.payload.token.processId == token1.processId && o.payload.token.status ==  Constants.GATEWAY_COMPLETED)).toHaveLength(0);
                 expect(calls["flow.token.emit"].filter(o => o.payload.token.processId == token1.processId)).toHaveLength(1);
                 expect(calls["flow.token.consume"].filter(o => o.payload.token.processId == token1.processId && o.payload.token.status == Constants.GATEWAY_ACTIVATED)).toHaveLength(1);
             })

@@ -2,21 +2,24 @@
 
 const { ServiceBroker } = require("moleculer");
 const { Constants } = require("imicros-flow-control");
+const { AclMiddleware } = require("imicros-acl");
 const { Sequence } = require("../index");
 const { Next } = require("../index");
 const { v4: uuid } = require("uuid");
 
 // helper
 const { Collect, clear } = require("./helper/collect");
-const { ACL, user, ownerId } = require("./helper/acl");
+const { ACL, user } = require("./helper/acl");
 const { Query, process } = require("./helper/query");
 const { Context, setContext } = require("./helper/context");
 const { Rules, rule } = require("./helper/rules");
 const { Feel } = require("./helper/feel");
+const { Agents } = require("./helper/agents");
+const { credentials } = require("./helper/credentials");
 
 const calls = [];
 const CollectEvents = Object.assign(Collect,{ settings: { calls: calls }});
-const QueryACL = Object.assign(Query,{ settings: { ownerId: ownerId }});
+const ownerId = credentials.ownerId;
 
 describe("Test sequence service", () => {
 
@@ -24,6 +27,7 @@ describe("Test sequence service", () => {
         return new ServiceBroker({
             namespace: "token",
             nodeID: nodeID,
+            middlewares: [AclMiddleware({ service: "acl" })],
             // transporter: "nats://192.168.2.124:4222",
             logLevel: "debug"
             // logLevel: "info"
@@ -32,7 +36,7 @@ describe("Test sequence service", () => {
     });    
     
     // Load services
-    [CollectEvents, Sequence, Next, Context, QueryACL, ACL, Rules, Feel].map(service => { return master.createService(service); }); 
+    [CollectEvents, Sequence, Next, Context, Query, ACL, Agents, Rules, Feel].map(service => { return master.createService(service); }); 
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));

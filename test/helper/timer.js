@@ -4,6 +4,7 @@ const Timer = {
     name: "timer",
     actions: {
         schedule: {
+            acl: "before",
             params: {
                 event: { type: "string" },
                 time: { type: "date" },
@@ -25,6 +26,7 @@ const Timer = {
     
     events: {
         "flow.timer.schedule": {
+            acl: "before",
             params: {
                 event: { type: "string" },
                 time: { type: "date" },

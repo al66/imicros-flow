@@ -1,3 +1,4 @@
+const { credentials } = require("./credentials");
 const _ = require("../../lib/util/lodash");
 
 const process = {};
@@ -15,44 +16,48 @@ const Query = {
             },			
             async handler(ctx) {
                 this.logger.info("query.Task called", { params: ctx.params, meta: ctx.meta, process: process } );
-                if (ctx.meta.ownerId !== this.ownerId) return false;
+                if (ctx.meta.ownerId !== credentials.ownerId) return false;
                 return [process.current];
             }
         },
         getSequence: {
+            acl: "before",
             params: {
                 processId: { type: "uuid" },
                 elementId: { type: "uuid" }
             },			
             async handler(ctx) {
                 this.logger.info("query.getSequence called", { params: ctx.params, meta: ctx.meta, process: process } );
-                if (ctx.meta.ownerId !== this.ownerId) return false;
+                if (ctx.meta.ownerId !== credentials.ownerId) return false;
                 return [process.current];
             }
         },
         getEvent: {
+            acl: "before",
             params: {
                 processId: { type: "uuid" },
                 elementId: { type: "uuid" }
             },			
             async handler(ctx) {
                 this.logger.info("query.getEvent called", { params: ctx.params, meta: ctx.meta, process: process } );
-                if (ctx.meta.ownerId !== this.ownerId) return false;
+                if (ctx.meta.ownerId !== credentials.ownerId) return false;
                 return [process.current];
             }
         },
         getGateway: {
+            acl: "before",
             params: {
                 processId: { type: "uuid" },
                 elementId: { type: "uuid" }
             },			
             async handler(ctx) {
                 this.logger.info("query.getGateway called", { params: ctx.params, meta: ctx.meta, process: process } );
-                if (ctx.meta.ownerId !== this.ownerId) return false;
+                if (ctx.meta.ownerId !== credentials.ownerId) return false;
                 return [process.current];
             }
         },
         subscriptions: {
+            acl: "before",
             params: {
                 eventName: { type: "string" },
                 version: { type: "string", optional: true },
@@ -67,32 +72,31 @@ const Query = {
             }
         },
         next: {
+            acl: "before",
             params: {
                 processId: { type: "uuid" },
                 elementId: { type: "uuid" }
             },			
             async handler(ctx) {
                 this.logger.info("query.next called", { params: ctx.params, meta: ctx.meta, process: process } );
-                if (ctx.meta.ownerId !== this.ownerId) return false;
+                if (ctx.meta.ownerId !== credentials.ownerId) return false;
                 let next = _.cloneDeep(process.next);
                 process.next = [];
                 return next;
             }
         },
         previous: {
+            acl: "before",
             params: {
                 processId: { type: "uuid" },
                 elementId: { type: "uuid" }
             },			
             async handler(ctx) {
                 this.logger.info("query.previous called", { params: ctx.params, meta: ctx.meta, process: process } );
-                if (ctx.meta.ownerId !== this.ownerId) return false;
+                if (ctx.meta.ownerId !== credentials.ownerId) return false;
                 return process.previous;
             }
         }
-    },
-    created () {
-        this.ownerId = (this.settings && this.settings.ownerId) ? this.settings.ownerId : "undefined";
     }
 };
 

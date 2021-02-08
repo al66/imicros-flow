@@ -2,6 +2,7 @@
 
 const { ServiceBroker } = require("moleculer");
 const { Constants } = require("imicros-flow-control");
+const { AclMiddleware } = require("imicros-acl");
 const { Next } = require("../index");
 const { Sequence } = require("../index");
 const { Activity } = require("../index");
@@ -11,20 +12,21 @@ const { v4: uuid } = require("uuid");
 const { Collect, clear } = require("./helper/collect");
 const { Query, process } = require("./helper/query");
 const { Context } = require("./helper/context");
-const { ACL, user, ownerId, serviceToken } = require("./helper/acl");
+const { ACL, user, meta } = require("./helper/acl");
+const { Agents } = require("./helper/agents");
+const { credentials } = require("./helper/credentials");
 
 const calls = [];
 const CollectEvents = Object.assign(Collect,{ settings: { calls: calls }});
-const QueryACL = Object.assign(Query,{ settings: { ownerId: ownerId }});
+const ownerId = credentials.ownerId;
 
 describe("Test next service", () => {
 
-    process.env = { SERVICE_TOKEN: serviceToken };
-    
     const [master] = ["master"].map(nodeID => {
         return new ServiceBroker({
             namespace: "token",
             nodeID: nodeID,
+            middlewares: [AclMiddleware({ service: "acl" })],
             // transporter: "nats://192.168.2.124:4222",
             logLevel: "debug" // "info" //"debug"
             // logger: false 
@@ -32,7 +34,7 @@ describe("Test next service", () => {
     });    
     
     // Load services
-    [CollectEvents, Next, Sequence, Activity, Context, QueryACL, ACL].map(service => { return master.createService(service); }); 
+    [CollectEvents, Next, Sequence, Activity, Context, Query, ACL, Agents].map(service => { return master.createService(service); }); 
     // const [collect, token, activity, query] = [CollectEvents, Token, Activity, Query].map(service => { return master.createService(service); }); 
 
     // Start & Stop
@@ -72,7 +74,7 @@ describe("Test next service", () => {
                 expect(calls["flow.token.emit"].filter(o => o.payload.token.type == Constants.SERVICE_TASK && o.payload.token.status == Constants.ACTIVITY_ACTIVATED)).toHaveLength(2);
             })
             .then(() => {
-                return master.call("flow.context.getToken", { processId: token.processId, instanceId: token.instanceId })
+                return master.call("flow.context.getToken", { processId: token.processId, instanceId: token.instanceId }, { meta })
                     .then(result => {
                         expect(result).toBeDefined();
                         expect(result.token).toEqual([]);

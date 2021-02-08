@@ -2,6 +2,7 @@
 
 const { ServiceBroker } = require("moleculer");
 const { Constants } = require("imicros-flow-control");
+const { AclMiddleware } = require("imicros-acl");
 const { Event } = require("../index");
 const { Next } = require("../index");
 const { v4: uuid } = require("uuid");
@@ -10,12 +11,14 @@ const { v4: uuid } = require("uuid");
 const { Collect, clear } = require("./helper/collect");
 const { Query, subscriptions, process } = require("./helper/query");
 const { Context } = require("./helper/context");
-const { ACL, user, ownerId, serviceToken } = require("./helper/acl");
+const { ACL, user } = require("./helper/acl");
 const { Timer } = require("./helper/timer");
+const { Agents } = require("./helper/agents");
+const { credentials } = require("./helper/credentials");
 
 const calls = [];
 const CollectEvents = Object.assign(Collect,{ settings: { calls: calls }});
-const QueryACL = Object.assign(Query,{ settings: { ownerId: ownerId }});
+const ownerId = credentials.ownerId;
 
 describe("Test activity service", () => {
 
@@ -23,6 +26,7 @@ describe("Test activity service", () => {
         return new ServiceBroker({
             namespace: "token",
             nodeID: nodeID,
+            middlewares: [AclMiddleware({ service: "acl" })],
             // transporter: "nats://192.168.2.124:4222",
             logLevel: "info" //"debug"
             // logger: false 
@@ -30,8 +34,7 @@ describe("Test activity service", () => {
     });    
     
     // Load services
-    [CollectEvents, Event, Next, Context, QueryACL, ACL, Timer].map(service => { return master.createService(service); }); 
-    // const [collect, token, activity, query] = [CollectEvents, Token, Activity, Query].map(service => { return master.createService(service); }); 
+    [CollectEvents, Event, Next, Context, Query, ACL, Agents, Timer].map(service => { return master.createService(service); }); 
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));
@@ -48,7 +51,27 @@ describe("Test activity service", () => {
             type: Constants.DEFAULT_EVENT
         };
         subscriptions.push(s1);
-        return master.emit("user.created", { id: "any", name: "Max" }, { meta: { user, ownerId, serviceToken }})
+        return master.emit("user.created", { id: "any", name: "Max" }, { meta: { user, ownerId }})
+            .delay(10)
+            .then(() => {
+                // console.log(calls["flow.instance.created"]);
+                expect(calls["flow.instance.created"]).toHaveLength(1);
+                expect(calls["flow.instance.created"].filter(o => o.payload.processId == s1.processId && o.payload.ownerId == s1.ownerId)).toHaveLength(1);
+                expect(calls["flow.token.emit"].filter(o => o.payload.token.type == s1.type && o.payload.token.status == Constants.EVENT_OCCURED)).toHaveLength(1);
+            }); 
+    });
+    
+    it("it should trigger events for subscriptions for internal events",() => {
+        let s1 = {
+            processId: uuid(),
+            versionId: uuid(),
+            elementId: uuid(),
+            ownerId: credentials.adminGroupId,
+            type: Constants.DEFAULT_EVENT
+        };
+        subscriptions.splice(0,1);
+        subscriptions.push(s1);
+        return master.emit("user.created", { id: "any", name: "Max" }, { meta: { user }})
             .delay(10)
             .then(() => {
                 // console.log(calls["flow.instance.created"]);

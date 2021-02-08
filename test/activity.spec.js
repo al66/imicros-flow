@@ -11,19 +11,19 @@ const { v4: uuid } = require("uuid");
 const { Collect, clear, LogActions } = require("./helper/collect");
 const { Query, process } = require("./helper/query");
 const { Context, context } = require("./helper/context");
-const { ACL, user, ownerId, serviceToken, accessToken } = require("./helper/acl");
+const { ACL, user } = require("./helper/acl");
 const { Test, call } = require("./helper/action");
 const { Rules, rule } = require("./helper/rules");
+const { Agents } = require("./helper/agents");
+const { credentials } = require("./helper/credentials");
 
 const calls = [];
 const actions = [];
 const CollectEvents = Object.assign(Collect,{ settings: { calls: calls }});
-const QueryACL = Object.assign(Query,{ settings: { ownerId: ownerId }});
+const ownerId = credentials.ownerId;
 
 describe("Test activity service", () => {
 
-    process.env = { SERVICE_TOKEN: serviceToken };
-    
     const [master] = ["master"].map(nodeID => {
         return new ServiceBroker({
             namespace: "token",
@@ -37,8 +37,7 @@ describe("Test activity service", () => {
     });    
     
     // Load services
-    [CollectEvents, Activity, Next, Context, QueryACL, ACL, Test, Rules].map(service => { return master.createService(service); }); 
-    // const [collect, token, activity, query] = [CollectEvents, Token, Activity, Query].map(service => { return master.createService(service); }); 
+    [CollectEvents, Activity, Next, Context, Query, ACL, Test, Rules, Agents].map(service => { return master.createService(service); }); 
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));
@@ -85,39 +84,47 @@ describe("Test activity service", () => {
                 expect(getTask).toHaveLength(2);
                 // expect both times correct meta data
                 expect(getTask[0].meta).toMatchObject({
-                    serviceToken: serviceToken,
+                    service: {
+                        serviceToken: credentials.serviceToken
+                    },
                     ownerId: ownerId,
                     user: user,
                     acl: {
-                        accessToken: accessToken
+                        accessToken: credentials.accessToken
                     }
                 });
                 expect(getTask[1].meta).toMatchObject({
-                    serviceToken: serviceToken,
+                    service: {
+                        serviceToken: credentials.serviceToken
+                    },
                     ownerId: ownerId,
                     user: user,
                     acl: {
-                        accessToken: accessToken
+                        accessToken: credentials.accessToken
                     }
                 });
 
                 // 2 times call to requestAccess: action prepare & action execute
-                let requestAccess = actions.filter(a => a.action.name === "acl.requestAccess");
+                let requestAccess = actions.filter(a => a.action.name === "agents.requestAccess");
                 expect(requestAccess[0]).toMatchObject({
                     params: {
-                        forGroupId: ownerId
+                        ownerId
                     },
                     meta: {
-                        serviceToken: serviceToken,
+                        service: {
+                            serviceToken: credentials.serviceToken
+                        },
                         user: user
                     }
                 });
                 expect(requestAccess[1]).toMatchObject({
                     params: {
-                        forGroupId: ownerId
+                        ownerId
                     },
                     meta: {
-                        serviceToken: serviceToken,
+                        service: {
+                            serviceToken: credentials.serviceToken
+                        },
                         user: user
                     }
                 });
@@ -218,39 +225,47 @@ describe("Test activity service", () => {
                 expect(getTask).toHaveLength(2);
                 // expect both times correct meta data
                 expect(getTask[0].meta).toMatchObject({
-                    serviceToken: serviceToken,
+                    service: {
+                        serviceToken: credentials.serviceToken
+                    },
                     ownerId: ownerId,
                     user: user,
                     acl: {
-                        accessToken: accessToken
+                        accessToken: credentials.accessToken
                     }
                 });
                 expect(getTask[1].meta).toMatchObject({
-                    serviceToken: serviceToken,
+                    service: {
+                        serviceToken: credentials.serviceToken
+                    },
                     ownerId: ownerId,
                     user: user,
                     acl: {
-                        accessToken: accessToken
+                        accessToken: credentials.accessToken
                     }
                 });
 
                 // 2 times call to requestAccess: action prepare & action execute
-                let requestAccess = actions.filter(a => a.action.name === "acl.requestAccess");
+                let requestAccess = actions.filter(a => a.action.name === "agents.requestAccess");
                 expect(requestAccess[0]).toMatchObject({
                     params: {
-                        forGroupId: ownerId
+                        ownerId
                     },
                     meta: {
-                        serviceToken: serviceToken,
+                        service: {
+                            serviceToken: credentials.serviceToken
+                        },
                         user: user
                     }
                 });
                 expect(requestAccess[1]).toMatchObject({
                     params: {
-                        forGroupId: ownerId
+                        ownerId
                     },
                     meta: {
-                        serviceToken: serviceToken,
+                        service: {
+                            serviceToken: credentials.serviceToken
+                        },
                         user: user
                     }
                 });
