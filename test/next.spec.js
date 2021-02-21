@@ -14,6 +14,7 @@ const { Query, process } = require("./helper/query");
 const { Context } = require("./helper/context");
 const { ACL, user, meta } = require("./helper/acl");
 const { Agents } = require("./helper/agents");
+const { Queue } = require("./helper/queue");
 const { credentials } = require("./helper/credentials");
 
 const calls = [];
@@ -34,7 +35,7 @@ describe("Test next service", () => {
     });    
     
     // Load services
-    [CollectEvents, Next, Sequence, Activity, Context, Query, ACL, Agents].map(service => { return master.createService(service); }); 
+    [CollectEvents, Next, Sequence, Activity, Context, Query, ACL, Agents, Queue].map(service => { return master.createService(service); }); 
     // const [collect, token, activity, query] = [CollectEvents, Token, Activity, Query].map(service => { return master.createService(service); }); 
 
     // Start & Stop

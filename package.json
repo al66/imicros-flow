@@ -1,10 +1,11 @@
 {
   "name": "imicros-flow",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
   "description": "Process engine of imicros framework",
   "main": "index.js",
+  "engines" : { "node" : ">=14.15" },
   "scripts": {
     "test": "jest --coverage --no-cache",
     "test-local": "jest --coverage --no-cache --silent --config=local.js",

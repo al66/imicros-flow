@@ -15,6 +15,7 @@ const { ACL, user } = require("./helper/acl");
 const { Test, call } = require("./helper/action");
 const { Rules, rule } = require("./helper/rules");
 const { Agents } = require("./helper/agents");
+const { Queue } = require("./helper/queue");
 const { credentials } = require("./helper/credentials");
 
 const calls = [];
@@ -37,7 +38,7 @@ describe("Test activity service", () => {
     });    
     
     // Load services
-    [CollectEvents, Activity, Next, Context, Query, ACL, Test, Rules, Agents].map(service => { return master.createService(service); }); 
+    [CollectEvents, Activity, Next, Context, Query, ACL, Test, Rules, Agents, Queue].map(service => { return master.createService(service); }); 
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));
@@ -283,5 +284,167 @@ describe("Test activity service", () => {
             }); 
     });
 
-  
+    it("it should map parameter and queue service agent task",() => {
+        let token = {
+            processId: uuid(),
+            versionId: uuid(),
+            instanceId: uuid(),
+            elementId: uuid(),
+            type: Constants.SERVICE_TASK,
+            status: Constants.ACTIVITY_ACTIVATED,
+            user: user,
+            ownerId: ownerId
+        };
+        let template = Buffer.from(JSON.stringify({ a: "{{inKey}}"})).toString("base64");
+        process.current = {
+            processId: token.processId,
+            versionId: token.versionId,
+            elementId: token.elementId,
+            type: token.type,
+            attributes: {
+                serviceId: uuid(),
+                contextKeys: ["inKey"],
+                prepFunction: "template",
+                template,
+                paramsKey: "myKey",
+                resultKey: "serviceA"
+            }
+        };        
+        call.result = {
+            test: "my result"  
+        };
+        context[token.instanceId] = [];
+        context[token.instanceId]["inKey"] = "test";
+        // context[token.instanceId][process.current.attributes.paramsKey] = {  a: "test" };
+        return master.emit("flow.token.emit", { token })
+            .delay(10)
+            .then(() => {
+                // console.log(actions);
+                // console.log(calls);
+                expect(calls["flow.token.emit"].filter(o => o.payload.token.status == Constants.ACTIVITY_READY)).toHaveLength(1);
+                
+                // 2 times call to getTask: action prepare & action execute
+                let getTask = actions.filter(a => a.action.name === "flow.query.getTask");
+                expect(getTask).toHaveLength(2);
+                // expect both times correct meta data
+                expect(getTask[0].meta).toMatchObject({
+                    service: {
+                        serviceToken: credentials.serviceToken
+                    },
+                    ownerId: ownerId,
+                    user: user,
+                    acl: {
+                        accessToken: credentials.accessToken
+                    }
+                });
+                expect(getTask[1].meta).toMatchObject({
+                    service: {
+                        serviceToken: credentials.serviceToken
+                    },
+                    ownerId: ownerId,
+                    user: user,
+                    acl: {
+                        accessToken: credentials.accessToken
+                    }
+                });
+
+                // 2 times call to requestAccess: action prepare & action execute
+                let requestAccess = actions.filter(a => a.action.name === "agents.requestAccess");
+                expect(requestAccess[0]).toMatchObject({
+                    params: {
+                        ownerId
+                    },
+                    meta: {
+                        service: {
+                            serviceToken: credentials.serviceToken
+                        },
+                        user: user
+                    }
+                });
+                expect(requestAccess[1]).toMatchObject({
+                    params: {
+                        ownerId
+                    },
+                    meta: {
+                        service: {
+                            serviceToken: credentials.serviceToken
+                        },
+                        user: user
+                    }
+                });
+                
+                // 2 times call to getTask: action prepare & action execute
+                let queueCalls = actions.filter(a => a.action.name === "queue.add");
+                expect(queueCalls).toHaveLength(1);
+                
+                //expect(calls["flow.activity.activated"]).toHaveLength(1);
+                // expect(calls["flow.activity.activated"].filter(o => o.payload.token == token)).toHaveLength(1);
+                // calls["flow.token.emit"].map(o => console.log(o.payload));
+                expect(calls["flow.token.emit"].filter(o => o.payload.token.status == Constants.ACTIVITY_READY)).toHaveLength(1);
+                expect(calls["flow.token.emit"].filter(o => o.payload.token.status == Constants.ACTIVITY_COMPLETED)).toHaveLength(0);
+                // expect(context[token.instanceId][process.current.attributes.resultKey]).toEqual(call.result);
+            }); 
+    });
+ 
+    it("it should complete service agent task",() => {
+        let token = {
+            processId: uuid(),
+            versionId: uuid(),
+            instanceId: uuid(),
+            elementId: uuid(),
+            type: Constants.SERVICE_TASK,
+            status: Constants.ACTIVITY_READY,
+            user: user,
+            ownerId: ownerId
+        };
+        let template = Buffer.from(JSON.stringify({ a: "{{inKey}}"})).toString("base64");
+        process.current = {
+            processId: token.processId,
+            versionId: token.versionId,
+            elementId: token.elementId,
+            type: token.type,
+            attributes: {
+                serviceId: uuid(),
+                contextKeys: ["inKey"],
+                prepFunction: "template",
+                template,
+                paramsKey: "myKey",
+                resultKey: "serviceA"
+            }
+        };        
+        let result = {
+            test: "my result"  
+        };
+        context[token.instanceId] = [];
+        context[token.instanceId]["inKey"] = "test";
+        // context[token.instanceId][process.current.attributes.paramsKey] = {  a: "test" };
+        return master.call("flow.activity.completed", { token, result })
+            .delay(10)
+            .then(() => {
+                // console.log(actions);
+                // console.log(calls);
+                expect(calls["flow.token.emit"].filter(o => o.payload.token.status == Constants.ACTIVITY_COMPLETED)).toHaveLength(1);
+                
+                // 1 time call to getTask: handle completed
+                let getTask = actions.filter(a => a.action.name === "flow.query.getTask");
+                expect(getTask).toHaveLength(1);
+                // expect both times correct meta data
+                expect(getTask[0].meta).toMatchObject({
+                    service: {
+                        serviceToken: credentials.serviceToken
+                    },
+                    ownerId: ownerId,
+                    user: user,
+                    acl: {
+                        accessToken: credentials.accessToken
+                    }
+                });
+                let contextCalls = actions.filter(a => a.action.name === "flow.context.add");
+                expect(contextCalls).toHaveLength(1);
+                
+                expect(calls["flow.token.consume"].filter(o => o.payload.token.status == Constants.ACTIVITY_READY)).toHaveLength(1);
+                expect(calls["flow.token.emit"].filter(o => o.payload.token.status == Constants.ACTIVITY_COMPLETED)).toHaveLength(1);
+            }); 
+    });
+ 
 });
