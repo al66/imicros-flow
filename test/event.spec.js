@@ -14,6 +14,9 @@ const { Context } = require("./helper/context");
 const { ACL, user } = require("./helper/acl");
 const { Timer } = require("./helper/timer");
 const { Agents } = require("./helper/agents");
+const { Rules } = require("./helper/rules");
+const { Feel } = require("./helper/feel");
+const { Queue } = require("./helper/queue");
 const { credentials } = require("./helper/credentials");
 
 const calls = [];
@@ -34,7 +37,7 @@ describe("Test activity service", () => {
     });    
     
     // Load services
-    [CollectEvents, Event, Next, Context, Query, ACL, Agents, Timer].map(service => { return master.createService(service); }); 
+    [CollectEvents, Event, Next, Context, Query, ACL, Agents, Rules, Feel, Queue, Timer].map(service => { return master.createService(service); }); 
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));

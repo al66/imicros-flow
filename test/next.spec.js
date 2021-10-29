@@ -14,6 +14,8 @@ const { Query, process } = require("./helper/query");
 const { Context } = require("./helper/context");
 const { ACL, user, meta } = require("./helper/acl");
 const { Agents } = require("./helper/agents");
+const { Rules } = require("./helper/rules");
+const { Feel } = require("./helper/feel");
 const { Queue } = require("./helper/queue");
 const { credentials } = require("./helper/credentials");
 
@@ -35,7 +37,7 @@ describe("Test next service", () => {
     });    
     
     // Load services
-    [CollectEvents, Next, Sequence, Activity, Context, Query, ACL, Agents, Queue].map(service => { return master.createService(service); }); 
+    [CollectEvents, Next, Sequence, Activity, Context, Query, ACL, Agents, Rules, Feel, Queue].map(service => { return master.createService(service); }); 
     // const [collect, token, activity, query] = [CollectEvents, Token, Activity, Query].map(service => { return master.createService(service); }); 
 
     // Start & Stop
@@ -55,8 +57,10 @@ describe("Test next service", () => {
             user: user,
             ownerId: ownerId
         };
-        process.next = [{ processId: token.processId, versionId: token.versionId, uid: uuid(), type: Constants.SERVICE_TASK },
-                        { processId: token.processId, versionId: token.versionId, uid: uuid(), type: Constants.SERVICE_TASK }];
+        process.next = [
+            { processId: token.processId, versionId: token.versionId, uid: uuid(), type: Constants.SERVICE_TASK },
+            { processId: token.processId, versionId: token.versionId, uid: uuid(), type: Constants.SERVICE_TASK }
+        ];
         // requested by activity prepare
         process.current = {
             processId: token.processId,
@@ -116,9 +120,11 @@ describe("Test next service", () => {
             ownerId: ownerId
         };
         const [ s1, s2, s3 ] = [uuid(), uuid(), uuid()];
-        process.next = [{ processId: token.processId, versionId: token.versionId, uid: s1, type: Constants.SEQUENCE_CONDITIONAL },
-                                         { processId: token.processId, versionId: token.versionId, uid: s2, type: Constants.SEQUENCE_CONDITIONAL },
-                                         { processId: token.processId, versionId: token.versionId, uid: s3, type: Constants.SEQUENCE_DEFAULT }];
+        process.next = [
+            { processId: token.processId, versionId: token.versionId, uid: s1, type: Constants.SEQUENCE_CONDITIONAL },
+            { processId: token.processId, versionId: token.versionId, uid: s2, type: Constants.SEQUENCE_CONDITIONAL },
+            { processId: token.processId, versionId: token.versionId, uid: s3, type: Constants.SEQUENCE_DEFAULT }
+        ];
         return master.emit("flow.token.emit", { token })
             .delay(10)
             .then(() => {
