@@ -42,7 +42,7 @@ describe("Test next service", () => {
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));
-    afterAll(() => Promise.all([master.stop()]));
+    afterAll(async () => await Promise.all([master.stop()]));
 
     beforeEach(() => clear(calls));
     
@@ -134,5 +134,5 @@ describe("Test next service", () => {
                 // expect(calls["flow.sequence.activated"]).toHaveLength(3);
             }); 
     });
-    
+ 
 });

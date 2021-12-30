@@ -42,7 +42,7 @@ describe("Test activity service", () => {
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));
-    afterAll(() => Promise.all([master.stop()]));
+    afterAll(async () => await Promise.all([master.stop()]));
 
     beforeEach(() => { clear(calls); actions.splice(0, actions.length); });
   
