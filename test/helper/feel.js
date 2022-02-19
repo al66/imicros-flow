@@ -1,4 +1,4 @@
-const {feel} = require("js-feel")();
+// const {feel} = require("js-feel")();
 
 // mock service feel
 const Feel = {
@@ -11,8 +11,9 @@ const Feel = {
             },			
             async handler(ctx) {
                 this.logger.info("feel called", { params: ctx.params, meta: ctx.meta } );
-                let parsedGrammar = feel.parse(ctx.params.expression);
-                return parsedGrammar.build(ctx.params.context);
+                // let parsedGrammar = feel.parse(ctx.params.expression);
+                // return parsedGrammar.build(ctx.params.context);
+                return null;
             }
         }
     }

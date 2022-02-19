@@ -47,8 +47,28 @@ const ACL = {
     }
 };
 
+// mock acl middleware
+const AclMiddleware = {
+    localAction(next, action) {
+        return async function(ctx) {
+            ctx.meta = Object.assign(ctx.meta,{
+                ownerId,
+                acl: {
+                    accessToken: "this is the access token",
+                    ownerId,
+                    unrestricted: true
+                },
+                user
+            });
+            ctx.broker.logger.debug("ACL meta data has been set", { meta: ctx.meta, action: action });
+            return next(ctx);
+        };
+    }    
+};
+
 module.exports = {
     user,
     meta,
-    ACL
+    ACL,
+    AclMiddleware
 };

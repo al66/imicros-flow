@@ -44,6 +44,7 @@ describe("Test sequence service", () => {
 
     beforeEach(() => clear(calls));
 
+    /*
     it("it should compute feel expression",() => {
         let params = {
             expression: "a + b - c",
@@ -57,6 +58,7 @@ describe("Test sequence service", () => {
             expect(result).toEqual(25);
         });
     });
+    */
     
     it("it should emit new token with status SEQUENCE_COMPLETED",() => {
         let token = {
@@ -127,6 +129,7 @@ describe("Test sequence service", () => {
             }); 
     });
     
+    /*
     it("it should evaluate feel expression and emit sequence completed token", () => {
         let sequenceId = uuid();
         let token = {
@@ -164,7 +167,9 @@ describe("Test sequence service", () => {
                 expect(calls["flow.token.consume"].filter(o => o.payload.token.processId == token.processId && o.payload.token.status == Constants.SEQUENCE_ACTIVATED)).toHaveLength(1);
             }); 
     });
-    
+    */
+
+    /*
     it("it should evaluate feel expression due to proceeding exclusive gateway and emit sequence completed token", () => {
         let sequenceId = uuid();
         let token = {
@@ -199,6 +204,7 @@ describe("Test sequence service", () => {
                 expect(calls["flow.token.consume"].filter(o => o.payload.token.processId == token.processId && o.payload.token.status == Constants.SEQUENCE_ACTIVATED)).toHaveLength(1);
             }); 
     });
+    */
     
     it("it should emit default sequence completed token", () => {
         let sequenceId = uuid();
