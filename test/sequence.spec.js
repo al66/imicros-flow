@@ -13,7 +13,7 @@ const { ACL, user } = require("./helper/acl");
 const { Query, process } = require("./helper/query");
 const { Context, setContext } = require("./helper/context");
 const { Rules, rule } = require("./helper/rules");
-const { Feel } = require("./helper/feel");
+// const { Feel } = require("./helper/feel");
 const { Agents } = require("./helper/agents");
 const { credentials } = require("./helper/credentials");
 
@@ -36,7 +36,7 @@ describe("Test sequence service", () => {
     });    
     
     // Load services
-    [CollectEvents, Sequence, Next, Context, Query, ACL, Agents, Rules, Feel].map(service => { return master.createService(service); }); 
+    [CollectEvents, Sequence, Next, Context, Query, ACL, Agents, Rules].map(service => { return master.createService(service); }); 
 
     // Start & Stop
     beforeAll(() => Promise.all([master.start()]));
