@@ -1,6 +1,6 @@
 {
   "name": "imicros-flow",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
   "description": "Process engine of imicros framework",
