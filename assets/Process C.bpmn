@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:flow="http://www.imicros.de/schema/bpmn/flow" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_108xu2f" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="9.3.1">
+  <bpmn:process id="Process_0sb9pcq" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_0xfjovz" name="Order placed">
+      <bpmn:extensionElements>
+        <flow:startEvent eventName="order.saved">
+          <flow:context io="out" key="order" />
+          <flow:expression language="FEEL">payload.status  = "20"</flow:expression>
+        </flow:startEvent>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_0niz9n0</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0niz9n0" sourceRef="StartEvent_0xfjovz" targetRef="Activity_0i02vff" />
+    <bpmn:endEvent id="Event_1h7cvft" name="Finished">
+      <bpmn:extensionElements>
+        <flow:endEvent eventName="simple.order.finished">
+          <flow:preparation>
+            <flow:context io="in" key="order" />
+            <flow:context io="in" key="result" />
+
+
+
+{
+    "order": order,
+    "result": result
+    "status": "finished"
+}                                        </flow:preparation>
+          <flow:context io="out" key="finished" />
+        </flow:endEvent>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1t7kw54</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1t7kw54" sourceRef="Activity_0i02vff" targetRef="Event_1h7cvft" />
+    <bpmn:serviceTask id="Activity_0i02vff" name="Call Service">
+      <bpmn:extensionElements>
+        <flow:serviceTask action="my.service">
+          <flow:preparation>
+            <flow:context io="in" key="order" />
+
+{
+    "number": order.orderNumber,
+    "status": "new"
+}                    </flow:preparation>
+          <flow:context io="in" key="param" />
+          <flow:context io="out" key="result" />
+        </flow:serviceTask>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0niz9n0</bpmn:incoming>
+      <bpmn:outgoing>Flow_1t7kw54</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0sb9pcq">
+      <bpmndi:BPMNEdge id="Flow_1t7kw54_di" bpmnElement="Flow_1t7kw54">
+        <di:waypoint x="410" y="160" />
+        <di:waypoint x="462" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0niz9n0_di" bpmnElement="Flow_0niz9n0">
+        <di:waypoint x="258" y="160" />
+        <di:waypoint x="310" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_0xfjovz">
+        <dc:Bounds x="222" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="208" y="185" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1h7cvft_di" bpmnElement="Event_1h7cvft">
+        <dc:Bounds x="462" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="460" y="185" width="41" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0zy81t2_di" bpmnElement="Activity_0i02vff">
+        <dc:Bounds x="310" y="120" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

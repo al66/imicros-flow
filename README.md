@@ -38,7 +38,7 @@ The goal is to cover all of them in the final version :wink:.
 
 Activities  |  Types  |  Markers  
 ----------- | ------- | ---------
-Task        | [ ] Send Task  <br/> [ ] Receive Task <br/> [ ] User Task <br/> [ ] Manual Task <br/> [x] Business Rule Task <br/> [x] Service Task <br/> [ ] Script Task | [ ] Parallel <br/> [ ] Sequential <br/> [ ] Ad Hoc  
+Task        | [ ] Send Task  <br/> [ ] Receive Task <br/> [ ] User Task <br/> [x] Manual Task <br/> [x] Business Rule Task <br/> [x] Service Task <br/> [ ] Script Task | [ ] Parallel <br/> [ ] Sequential <br/> [ ] Ad Hoc  
 Sub-Process  |         | [ ] Loop <br/> [ ] Parallel <br/> [ ] Sequential <br/> [ ] Ad Hoc <br/> [ ] Compensation
 Event Sub-Process  |         | [ ] Loop <br/> [ ] Parallel <br/> [ ] Sequential <br/> [ ] Ad Hoc <br/> [ ] Compensation
 Transaction  |         | [ ] Loop <br/> [ ] Parallel <br/> [ ] Sequential <br/> [ ] Compensation

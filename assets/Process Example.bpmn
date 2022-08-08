@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:fe="http://www.imicros.de/schema/bpmn/fe" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_1" isExecutable="false">
+    <bpmn:extensionElements>
+      <fe:executionParameter />
+    </bpmn:extensionElements>
+    <bpmn:startEvent id="StartEvent_1" name="any event">
+      <bpmn:extensionElements>
+        <fe:executionParameter contextKeys="" contextKey="event" event="any.event" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_1x6ff8k</bpmn:outgoing>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_064w0pq" />
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1x6ff8k" sourceRef="StartEvent_1" targetRef="Activity_0gegtnh" />
+    <bpmn:businessRuleTask id="Activity_0gegtnh" name="Determine risk class">
+      <bpmn:extensionElements>
+        <fe:executionParameter ruleset="Risk class.dmn" contextKeys="event" contextKey="risk class" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1x6ff8k</bpmn:incoming>
+      <bpmn:outgoing>Flow_0avid7c</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:sequenceFlow id="Flow_0avid7c" sourceRef="Activity_0gegtnh" targetRef="Activity_1eef854" />
+    <bpmn:serviceTask id="Activity_1eef854" name="Map to result">
+      <bpmn:extensionElements>
+        <fe:executionParameter prepFunction="" contextKeys="" action="JsonMap.map" paramsKey="risk class" resultKey="result" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0avid7c</bpmn:incoming>
+      <bpmn:outgoing>Flow_0mp7x00</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0mp7x00" sourceRef="Activity_1eef854" targetRef="Activity_0rhhidr" />
+    <bpmn:serviceTask id="Activity_0rhhidr" name="Update Buiness Partner">
+      <bpmn:extensionElements>
+        <fe:executionParameter prepFunction="map" template="ewogICAgImlkIjogIjEyMzQ1Njc4OSIsCiAgICAiaW5wdXQiOiBjcmVkaXREYXRhLnJpc2tDbGFzcwp9" contextKeys="creditData" serviceId="c8f1a3cf-c2f0-49cb-8a32-886d89b58753" paramsKey="paramsUpdateBP" resultKey="update" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0mp7x00</bpmn:incoming>
+      <bpmn:outgoing>Flow_15p04yd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_0g0uefe">
+      <bpmn:extensionElements>
+        <fe:executionParameter />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_15p04yd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_15p04yd" sourceRef="Activity_0rhhidr" targetRef="Event_0g0uefe" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNEdge id="Flow_15p04yd_di" bpmnElement="Flow_15p04yd">
+        <di:waypoint x="700" y="160" />
+        <di:waypoint x="752" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mp7x00_di" bpmnElement="Flow_0mp7x00">
+        <di:waypoint x="550" y="160" />
+        <di:waypoint x="600" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0avid7c_di" bpmnElement="Flow_0avid7c">
+        <di:waypoint x="390" y="160" />
+        <di:waypoint x="450" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1x6ff8k_di" bpmnElement="Flow_1x6ff8k">
+        <di:waypoint x="238" y="160" />
+        <di:waypoint x="290" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1c6k2w9_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="202" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="196" y="185" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_03trhls_di" bpmnElement="Activity_0gegtnh">
+        <dc:Bounds x="290" y="120" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dv803p_di" bpmnElement="Activity_1eef854">
+        <dc:Bounds x="450" y="120" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1n70o8w_di" bpmnElement="Activity_0rhhidr">
+        <dc:Bounds x="600" y="120" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0g0uefe_di" bpmnElement="Event_0g0uefe">
+        <dc:Bounds x="752" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -16,7 +16,12 @@
     "test-activity": "jest test/activity.spec.js --no-cache --config=local.js --detectOpenHandles",
     "test-sequence": "jest test/sequence.spec.js --no-cache --config=local.js --detectOpenHandles",
     "test-event": "jest test/event.spec.js --no-cache --config=local.js --detectOpenHandles",
-    "test-gateway": "jest test/gateway.spec.js --no-cache --config=local.js --detectOpenHandles"
+    "test-gateway": "jest test/gateway.spec.js --no-cache --config=local.js --detectOpenHandles",
+    "test-main": "jest test/main.spec.js test/main.*.spec.js  --no-cache --silent --config=local.js",
+    "test-A": "jest test/main.A.spec.js --no-cache --config=local.js",
+    "test-B": "jest test/main.B.spec.js --no-cache --config=local.js",
+    "test-C": "jest test/main.C.spec.js --no-cache --config=local.js",
+    "test-cassandra": "jest test/cassandra.spec.js --no-cache --config=local.js"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -47,14 +52,16 @@
   "devDependencies": {
     "benchmark": "^2.1.4",
     "imicros-acl": "^0.0.13",
-    "jest": "^27.5.1",
-    "moleculer": "^0.14.19",
-    "nats": "^2.6.1"
+    "jest": "^28.1.3",
+    "moleculer": "^0.14.21",
+    "nats": "^2.7.1"
   },
   "dependencies": {
-    "cron-parser": "^4.2.1",
+    "cassandra-driver": "^4.6.4",
+    "cron-parser": "^4.6.0",
+    "fast-xml-parser": "^4.0.9",
     "imicros-flow-control": "^0.0.12",
-    "imicros-flow-map": "0.0.2",
+    "imicros-flow-map": "0.0.5",
     "rfdc": "^1.3.0",
     "uuid": "^8.3.2"
   }

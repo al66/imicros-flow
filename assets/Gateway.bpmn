@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="sid-38422fae-e03e-43a3-bef4-bd33b32041b2" targetNamespace="http://bpmn.io/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="9.2.0">
+  <process id="Process_1" isExecutable="false">
+    <startEvent id="StartEvent_1y45yut" name="hunger noticed">
+      <outgoing>SequenceFlow_0h21x7r</outgoing>
+    </startEvent>
+    <sequenceFlow id="SequenceFlow_0h21x7r" sourceRef="StartEvent_1y45yut" targetRef="Task_1hcentk" />
+    <exclusiveGateway id="ExclusiveGateway_15hu1pt" name="desired dish?">
+      <incoming>SequenceFlow_0wnb4ke</incoming>
+      <outgoing>Flow_0no5khp</outgoing>
+      <outgoing>Flow_0a2iaav</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="SequenceFlow_0wnb4ke" sourceRef="Task_1hcentk" targetRef="ExclusiveGateway_15hu1pt" />
+    <sequenceFlow id="Flow_0no5khp" name="pizza" sourceRef="ExclusiveGateway_15hu1pt" targetRef="Activity_0r6brdm" />
+    <sequenceFlow id="Flow_0a2iaav" name="noodles" sourceRef="ExclusiveGateway_15hu1pt" targetRef="Activity_14hpiex" />
+    <endEvent id="Event_09l5v97">
+      <incoming>Flow_1285ydz</incoming>
+      <incoming>Flow_197zvw7</incoming>
+    </endEvent>
+    <sequenceFlow id="Flow_1285ydz" sourceRef="Activity_0r6brdm" targetRef="Event_09l5v97" />
+    <sequenceFlow id="Flow_197zvw7" sourceRef="Activity_14hpiex" targetRef="Event_09l5v97" />
+    <userTask id="Task_1hcentk" name="choose recipe">
+      <incoming>SequenceFlow_0h21x7r</incoming>
+      <outgoing>SequenceFlow_0wnb4ke</outgoing>
+    </userTask>
+    <userTask id="Activity_0r6brdm" name="order pizza">
+      <incoming>Flow_0no5khp</incoming>
+      <outgoing>Flow_1285ydz</outgoing>
+    </userTask>
+    <userTask id="Activity_14hpiex" name="cook pasta">
+      <incoming>Flow_0a2iaav</incoming>
+      <outgoing>Flow_197zvw7</outgoing>
+    </userTask>
+  </process>
+  <bpmndi:BPMNDiagram id="BpmnDiagram_1">
+    <bpmndi:BPMNPlane id="BpmnPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNEdge id="SequenceFlow_0wnb4ke_di" bpmnElement="SequenceFlow_0wnb4ke">
+        <omgdi:waypoint x="340" y="120" />
+        <omgdi:waypoint x="395" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0h21x7r_di" bpmnElement="SequenceFlow_0h21x7r">
+        <omgdi:waypoint x="188" y="120" />
+        <omgdi:waypoint x="240" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0no5khp_di" bpmnElement="Flow_0no5khp">
+        <omgdi:waypoint x="445" y="120" />
+        <omgdi:waypoint x="500" y="120" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="459" y="102" width="27" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0a2iaav_di" bpmnElement="Flow_0a2iaav">
+        <omgdi:waypoint x="420" y="145" />
+        <omgdi:waypoint x="420" y="230" />
+        <omgdi:waypoint x="500" y="230" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="430" y="173" width="39" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1285ydz_di" bpmnElement="Flow_1285ydz">
+        <omgdi:waypoint x="600" y="120" />
+        <omgdi:waypoint x="712" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_197zvw7_di" bpmnElement="Flow_197zvw7">
+        <omgdi:waypoint x="600" y="230" />
+        <omgdi:waypoint x="730" y="230" />
+        <omgdi:waypoint x="730" y="138" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_1y45yut_di" bpmnElement="StartEvent_1y45yut">
+        <omgdc:Bounds x="152" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="134" y="145" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_15hu1pt_di" bpmnElement="ExclusiveGateway_15hu1pt" isMarkerVisible="true">
+        <omgdc:Bounds x="395" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="387" y="71" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_09l5v97_di" bpmnElement="Event_09l5v97">
+        <omgdc:Bounds x="712" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_08mqxr4_di" bpmnElement="Task_1hcentk">
+        <omgdc:Bounds x="240" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1sboc9k_di" bpmnElement="Activity_0r6brdm">
+        <omgdc:Bounds x="500" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1gtwq7l_di" bpmnElement="Activity_14hpiex">
+        <omgdc:Bounds x="500" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

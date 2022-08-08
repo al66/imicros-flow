@@ -41,7 +41,7 @@ describe("Test next service", () => {
     // const [collect, token, activity, query] = [CollectEvents, Token, Activity, Query].map(service => { return master.createService(service); }); 
 
     // Start & Stop
-    beforeAll(() => Promise.all([master.start()]));
+    beforeAll(async () => await Promise.all([master.start()]));
     afterAll(async () => await Promise.all([master.stop()]));
 
     beforeEach(() => clear(calls));

@@ -13,7 +13,7 @@ const Queue = {
                 this.logger.info("queue called", { params: ctx.params, meta: ctx.meta } );
                 return true;
             }
-        }
+        }        
     }
 };
 
