@@ -8,7 +8,7 @@ const { v4: uuid } = require("uuid");
 // const objectName = "assets/Process Example.bpmn";
 // const objectName = "assets/Gateway.bpmn";
 // const objectName = "assets/All Elements.bpmn";
-const objectName = "assets/Simple A.bpmn";
+const objectName = "assets/Process E.bpmn";
 const xmlData = fs.readFileSync(objectName);
 
 async function run () {

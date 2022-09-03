@@ -2,7 +2,7 @@
 
 const { ServiceBroker } = require("moleculer");
 const { AclMiddleware } = require("imicros-acl");
-const { Factory, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
+const { Context, Factory, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
 
 // helper & mocks
 const { ACL, meta, user } = require("./helper/acl");
@@ -89,7 +89,9 @@ describe("Test flow service", () => {
     describe("Test factory class", () => {
 
         it("it should instantiate a factory object", async () => {
-            factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
+            // factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
+            Context.set({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
+            factory = Factory;
             expect(factory).toBeDefined();
         });
 

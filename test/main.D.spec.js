@@ -10,13 +10,16 @@ const { Parser } = require("../lib/parser/basic");
 const { DB } = require("../lib/db/cassandra");
 const { Keys } = require("./helper/keys");
 const { Agents } = require("./helper/agents");
+const { MyService, test } = require("./helper/my");
 const { Feel, setFeelRequest } = require("./helper/feel");
+const { Queue, getQueue, clearQueue } = require("./helper/queue");
 const { credentials } = require("./helper/credentials");
 const Constants = require("../lib/util/constants");
 const fs = require("fs");
 const { v4: uuid } = require("uuid");
 const util = require("util");
 const { Collect, clear } = require("./helper/collect");
+const { call } = require("./helper/action");
 
 const calls = [];
 const CollectEvents = Object.assign(Collect,{ settings: { calls: calls }});
@@ -35,16 +38,20 @@ const settings = {
 const services = {
     keys: "v1.keys",
     agents: "agents",
-    feel: "feel"
+    feel: "feel",
+    queue: "queue"
 }
 
-const xmlData = fs.readFileSync("assets/Process B.bpmn");
+const xmlData = fs.readFileSync("assets/Process D.bpmn");
 
-describe("Test Process B", () => {
+describe("Test Process D", () => {
 
     let broker, db, factory, parsedData, element, instanceId, token;
 
-    beforeEach(() => clear(calls));
+    beforeEach(() => {
+        clear(calls);
+        clearQueue();
+    });
 
     describe("Test start broker and connect to db", () => {
 
@@ -57,6 +64,8 @@ describe("Test Process B", () => {
             broker.createService(ACL);
             broker.createService(Agents);
             broker.createService(Feel);
+            broker.createService(MyService);
+            broker.createService(Queue);
             broker.createService(Keys);
             broker.createService(CollectEvents);
             await broker.start();
@@ -72,7 +81,7 @@ describe("Test Process B", () => {
         });
 
         it("it should instantiate a factory object", async () => {
-            //factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
+            // factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
             factory = Factory;
             expect(factory).toBeDefined();
             // expect(calls["flow.instance.created"]).toHaveLength(1);
@@ -241,7 +250,7 @@ describe("Test Process B", () => {
                 versionId: parsedData.version.id,
                 instanceId,
                 elementId: expect.any(String),
-                type: Constants.BUSINESS_RULE_TASK,
+                type: Constants.SERVICE_TASK,
                 status: Constants.ACTIVITY_ACTIVATED,
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
@@ -251,10 +260,15 @@ describe("Test Process B", () => {
             }));
         });
 
-        it("it should process the business rule task preparation", async () => {
+        it("it should process the service task preparation", async () => {
             // call
             await factory.processToken({ token });
             // check
+            const value = await db.getContextKey({ opts:meta, instanceId, key: "param" });
+            expect(value).toEqual(expect.objectContaining({
+                number: "123456",
+                status: "new"
+            }));
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
             expect(token).toEqual(expect.objectContaining({
@@ -262,7 +276,7 @@ describe("Test Process B", () => {
                 versionId: parsedData.version.id,
                 instanceId,
                 elementId: expect.any(String),
-                type: Constants.BUSINESS_RULE_TASK,
+                type: Constants.SERVICE_TASK,
                 status: Constants.ACTIVITY_READY,
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
@@ -272,18 +286,28 @@ describe("Test Process B", () => {
             }));
         });
 
-        it("it should process the business rule task", async () => {
-            const decision = {
-                responsible: {
-                    role: "sales"
-                } 
-            }
-            setFeelRequest({ path: "path/to/decsion", value: decision})
+        it("it should queue the task for the service", async () => {
             // call
             await factory.processToken({ token });
             // check
-            const value = await db.getContextKey({ opts:meta, instanceId, key: "decision" })
-            expect(value).toEqual(decision);
+            expect(calls["flow.token.emit"]).toHaveLength(0);
+            const queue = getQueue();
+            expect(queue[0].params).toEqual(expect.objectContaining({
+                serviceId: expect.any(String),
+                value: expect.any(Object),
+                token
+            }));
+        });
+
+        it("it should complete the task", async () => {
+            const result = {
+                accepted: true 
+            }
+            // call
+            await factory.completed({ token, result });
+            // check
+            const value = await db.getContextKey({ opts:meta, instanceId, key: "result" })
+            expect(value).toEqual(result);
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
             expect(token).toEqual(expect.objectContaining({
@@ -291,7 +315,7 @@ describe("Test Process B", () => {
                 versionId: parsedData.version.id,
                 instanceId,
                 elementId: expect.any(String),
-                type: Constants.BUSINESS_RULE_TASK,
+                type: Constants.SERVICE_TASK,
                 status: Constants.ACTIVITY_COMPLETED,
                 user: meta.user,
                 ownerId: meta.acl.ownerId,

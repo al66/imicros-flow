@@ -4,6 +4,7 @@
 "use strict";
 
 module.exports = {
+    Stream: require("./lib/process/stream"), 
     Event: require("./lib/event"),
     Next: require("./lib/next"),
     Sequence: require("./lib/sequence"),

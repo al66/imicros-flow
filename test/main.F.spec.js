@@ -2,7 +2,7 @@
 
 const { ServiceBroker } = require("moleculer");
 const { AclMiddleware } = require("imicros-acl");
-const { Context, DeploymentManager, Factory, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
+const {Context, DeploymentManager, Factory, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
 
 // helper & mocks
 const { ACL, meta, user } = require("./helper/acl");
@@ -10,13 +10,16 @@ const { Parser } = require("../lib/parser/basic");
 const { DB } = require("../lib/db/cassandra");
 const { Keys } = require("./helper/keys");
 const { Agents } = require("./helper/agents");
+const { MyService, test } = require("./helper/my");
 const { Feel, setFeelRequest } = require("./helper/feel");
+const { Queue, getQueue, clearQueue } = require("./helper/queue");
 const { credentials } = require("./helper/credentials");
 const Constants = require("../lib/util/constants");
 const fs = require("fs");
 const { v4: uuid } = require("uuid");
 const util = require("util");
 const { Collect, clear } = require("./helper/collect");
+const { call } = require("./helper/action");
 
 const calls = [];
 const CollectEvents = Object.assign(Collect,{ settings: { calls: calls }});
@@ -35,16 +38,20 @@ const settings = {
 const services = {
     keys: "v1.keys",
     agents: "agents",
-    feel: "feel"
+    feel: "feel",
+    queue: "queue"
 }
 
-const xmlData = fs.readFileSync("assets/Process B.bpmn");
+const xmlData = fs.readFileSync("assets/Process F.bpmn");
 
-describe("Test Process B", () => {
+describe("Test Process F", () => {
 
-    let broker, db, factory, parsedData, element, instanceId, token;
+    let broker, db, factory, parsedData, element, instanceId, token, tokenB;
 
-    beforeEach(() => clear(calls));
+    beforeEach(() => {
+        clear(calls);
+        clearQueue();
+    });
 
     describe("Test start broker and connect to db", () => {
 
@@ -57,6 +64,8 @@ describe("Test Process B", () => {
             broker.createService(ACL);
             broker.createService(Agents);
             broker.createService(Feel);
+            broker.createService(MyService);
+            broker.createService(Queue);
             broker.createService(Keys);
             broker.createService(CollectEvents);
             await broker.start();
@@ -72,7 +81,7 @@ describe("Test Process B", () => {
         });
 
         it("it should instantiate a factory object", async () => {
-            //factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
+            // factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
             factory = Factory;
             expect(factory).toBeDefined();
             // expect(calls["flow.instance.created"]).toHaveLength(1);
@@ -126,7 +135,8 @@ describe("Test Process B", () => {
         it("it should raise the event", async () => {
             const eventName = 'order.saved'
             const payload = {
-                orderNumber: '123456'
+                orderNumber: '123456',
+                status: 30
             }
             // call
             await factory.raiseEvent ({ eventName, payload, meta } )
@@ -188,7 +198,7 @@ describe("Test Process B", () => {
             }));
         });
 
-        it("it should activate the sequence to task", async () => {
+        it("it should activate the sequence to the gateway", async () => {
             // call
             await factory.processToken({ token });
             // check
@@ -209,7 +219,7 @@ describe("Test Process B", () => {
             }));
         });
 
-        it("it should process the sequence to task", async () => {
+        it("it should process the sequence to the gateway", async () => {
             // call
             await factory.processToken({ token });
             // check
@@ -230,7 +240,7 @@ describe("Test Process B", () => {
             }));
         });
 
-        it("it should activate the task", async () => {
+        it("it should activate the gateway", async () => {
             // call
             await factory.processToken({ token });
             // check
@@ -241,8 +251,8 @@ describe("Test Process B", () => {
                 versionId: parsedData.version.id,
                 instanceId,
                 elementId: expect.any(String),
-                type: Constants.BUSINESS_RULE_TASK,
-                status: Constants.ACTIVITY_ACTIVATED,
+                type: Constants.PARALLEL_GATEWAY,
+                status: Constants.GATEWAY_ACTIVATED,
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
@@ -251,7 +261,7 @@ describe("Test Process B", () => {
             }));
         });
 
-        it("it should process the business rule task preparation", async () => {
+        it("it should process the gateway", async () => {
             // call
             await factory.processToken({ token });
             // check
@@ -262,8 +272,8 @@ describe("Test Process B", () => {
                 versionId: parsedData.version.id,
                 instanceId,
                 elementId: expect.any(String),
-                type: Constants.BUSINESS_RULE_TASK,
-                status: Constants.ACTIVITY_READY,
+                type: Constants.PARALLEL_GATEWAY,
+                status: Constants.GATEWAY_COMPLETED,
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
@@ -272,40 +282,11 @@ describe("Test Process B", () => {
             }));
         });
 
-        it("it should process the business rule task", async () => {
-            const decision = {
-                responsible: {
-                    role: "sales"
-                } 
-            }
-            setFeelRequest({ path: "path/to/decsion", value: decision})
+        it("it should activate both sequences to tasks", async () => {
             // call
             await factory.processToken({ token });
             // check
-            const value = await db.getContextKey({ opts:meta, instanceId, key: "decision" })
-            expect(value).toEqual(decision);
-            expect(calls["flow.token.emit"]).toHaveLength(1);
-            token = calls["flow.token.emit"][0].payload.token;
-            expect(token).toEqual(expect.objectContaining({
-                processId: parsedData.process.id,
-                versionId: parsedData.version.id,
-                instanceId,
-                elementId: expect.any(String),
-                type: Constants.BUSINESS_RULE_TASK,
-                status: Constants.ACTIVITY_COMPLETED,
-                user: meta.user,
-                ownerId: meta.acl.ownerId,
-                attributes: {
-                    lastToken: expect.any(Object)
-                }
-            }));
-        });
-
-        it("it should activate the sequence to the end event", async () => {
-            // call
-            await factory.processToken({ token });
-            // check
-            expect(calls["flow.token.emit"]).toHaveLength(1);
+            expect(calls["flow.token.emit"]).toHaveLength(2);
             token = calls["flow.token.emit"][0].payload.token;
             expect(token).toEqual(expect.objectContaining({
                 processId: parsedData.process.id,
@@ -320,21 +301,14 @@ describe("Test Process B", () => {
                     lastToken: expect.any(Object)
                 }
             }));
-        });
-
-        it("it should process the sequence to the end event", async () => {
-            // call
-            await factory.processToken({ token });
-            // check
-            expect(calls["flow.token.emit"]).toHaveLength(1);
-            token = calls["flow.token.emit"][0].payload.token;
-            expect(token).toEqual(expect.objectContaining({
+            tokenB = calls["flow.token.emit"][1].payload.token;
+            expect(tokenB).toEqual(expect.objectContaining({
                 processId: parsedData.process.id,
                 versionId: parsedData.version.id,
                 instanceId,
                 elementId: expect.any(String),
                 type: Constants.SEQUENCE_STANDARD,
-                status: Constants.SEQUENCE_COMPLETED,
+                status: Constants.SEQUENCE_ACTIVATED,
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
@@ -343,7 +317,90 @@ describe("Test Process B", () => {
             }));
         });
 
-        it("it should activate the end event", async () => {
+        it("should process path A until the sequence to the second gateway", async () => {
+            // calls
+            // complete sequence path A
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][0].payload.token;
+            // activate task path A
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][1].payload.token;
+            // prepare task path A
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][2].payload.token;
+            // complete task path A
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][3].payload.token;
+            // activate sequence path A to the second gateway
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][4].payload.token;
+            // complete sequence path A to the second gateway
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][5].payload.token;
+            // activate second gateway path A
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][6].payload.token;
+            expect(token).toEqual(expect.objectContaining({
+                processId: parsedData.process.id,
+                versionId: parsedData.version.id,
+                instanceId,
+                elementId: expect.any(String),
+                type: Constants.PARALLEL_GATEWAY,
+                status: Constants.GATEWAY_ACTIVATED,
+                user: meta.user,
+                ownerId: meta.acl.ownerId,
+                attributes: {
+                    lastToken: expect.any(Object)
+                }
+            }));
+        }); 
+
+        it("should wait at second gateway for path B", async () => {
+            // calls
+            await factory.processToken({ token });
+            expect(calls["flow.token.emit"]).toHaveLength(0);
+        }); 
+
+        it("should process path B until the sequence to the second gateway", async () => {
+            // calls
+            // complete sequence path B
+            token = tokenB;
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][0].payload.token;
+            // activate task path B
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][1].payload.token;
+            // prepare task path B
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][2].payload.token;
+            // complete task path B
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][3].payload.token;
+            // activate sequence path B to the second gateway
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][4].payload.token;
+            // complete sequence path B to the second gateway
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][5].payload.token;
+            // activate second gateway path B
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][6].payload.token;
+            expect(token).toEqual(expect.objectContaining({
+                processId: parsedData.process.id,
+                versionId: parsedData.version.id,
+                instanceId,
+                elementId: expect.any(String),
+                type: Constants.PARALLEL_GATEWAY,
+                status: Constants.GATEWAY_ACTIVATED,
+                user: meta.user,
+                ownerId: meta.acl.ownerId,
+                attributes: {
+                    lastToken: expect.any(Object)
+                }
+            }));
+        }); 
+
+        it("it should process the second gateway", async () => {
             // call
             await factory.processToken({ token });
             // check
@@ -354,8 +411,8 @@ describe("Test Process B", () => {
                 versionId: parsedData.version.id,
                 instanceId,
                 elementId: expect.any(String),
-                type: Constants.DEFAULT_EVENT,
-                status: Constants.EVENT_ACTIVATED,
+                type: Constants.PARALLEL_GATEWAY,
+                status: Constants.GATEWAY_COMPLETED,
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
@@ -364,33 +421,23 @@ describe("Test Process B", () => {
             }));
         });
 
-        it("it should prepare the end event", async () => {
-            // call
+        it("it should process until end event", async () => {
+            // calls
+            // activate last sequence
             await factory.processToken({ token });
-            // check
-            expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
-            expect(token).toEqual(expect.objectContaining({
-                processId: parsedData.process.id,
-                versionId: parsedData.version.id,
-                instanceId,
-                elementId: expect.any(String),
-                type: Constants.DEFAULT_EVENT,
-                status: Constants.EVENT_READY,
-                user: meta.user,
-                ownerId: meta.acl.ownerId,
-                attributes: {
-                    lastToken: expect.any(Object)
-                }
-            }));
-        });
-
-        it("it should throw the end event", async () => {
-            // call
+            // complete last sequence
             await factory.processToken({ token });
-            // check
-            expect(calls["flow.token.emit"]).toHaveLength(1);
-            token = calls["flow.token.emit"][0].payload.token;
+            token = calls["flow.token.emit"][1].payload.token;
+            // activate end event
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][2].payload.token;
+            // prepare end event
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][3].payload.token;
+            // throw end event
+            await factory.processToken({ token });
+            token = calls["flow.token.emit"][4].payload.token;
             expect(token).toEqual(expect.objectContaining({
                 processId: parsedData.process.id,
                 versionId: parsedData.version.id,

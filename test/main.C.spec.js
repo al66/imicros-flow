@@ -2,7 +2,7 @@
 
 const { ServiceBroker } = require("moleculer");
 const { AclMiddleware } = require("imicros-acl");
-const { Factory, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
+const { Context, DeploymentManager, Factory, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
 
 // helper & mocks
 const { ACL, meta, user } = require("./helper/acl");
@@ -71,10 +71,12 @@ describe("Test Process C", () => {
             await db.connect();
             expect(db).toBeDefined();
             expect(db instanceof DB).toEqual(true);
+            Context.set({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
         });
 
         it("it should instantiate a factory object", async () => {
-            factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
+            //factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
+            factory = Factory;
             expect(factory).toBeDefined();
             // expect(calls["flow.instance.created"]).toHaveLength(1);
         });
@@ -205,7 +207,7 @@ describe("Test Process C", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -226,7 +228,7 @@ describe("Test Process C", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -247,7 +249,7 @@ describe("Test Process C", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -273,7 +275,7 @@ describe("Test Process C", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -299,7 +301,7 @@ describe("Test Process C", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -320,7 +322,7 @@ describe("Test Process C", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -341,7 +343,7 @@ describe("Test Process C", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -362,7 +364,7 @@ describe("Test Process C", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -383,7 +385,7 @@ describe("Test Process C", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -404,7 +406,7 @@ describe("Test Process C", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });

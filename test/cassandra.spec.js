@@ -32,8 +32,12 @@ const settings = {
 
 describe("Test database connection", () => {
 
-    let broker, opts, db, parser, parsedData, element, sequence, instance;
-    
+    let broker, opts, db, parser, parsedData, element, sequence, instance, time;
+
+    beforeAll(() => {
+        time = new Date(Date.now())
+    })
+
     beforeEach(() => { 
         opts = meta
     })
@@ -538,7 +542,7 @@ describe("Test database connection", () => {
             });
         });
 
-        it("it should cosnume the last two active token ", () => {
+        it("it should consume the last two active token ", () => {
             let params = {
                 opts,
                 instanceId: instance,
@@ -567,6 +571,69 @@ describe("Test database connection", () => {
                     expect.objectContaining({ token: { token: "t2", instanceId: instance }}),
                     expect.objectContaining({ token: { token: "t3", instanceId: instance }})
                 ]));
+            });
+        });
+
+        it("it should add a scheduled token", () => {
+            let params = {
+                time,
+                token: {
+                    instanceId: instance
+                }
+            };
+            return db.scheduleToken(params).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toEqual(true);
+            });
+        });
+
+        it("it should add a second scheduled token for the same time", () => {
+            let params = {
+                time,
+                token: {
+                    instanceId: instance
+                }
+            };
+            return db.scheduleToken(params).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toEqual(true);
+            });
+        });
+
+        it("it should fetch all scheduled token", () => {
+            function callback ({ id, time, payload }) {
+                console.log(id, time, payload)
+            }
+            let params = {
+                time,
+                runner: uuid(),
+                callback
+            };
+            return db.fetchScheduledToken(params).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toEqual(true);
+            });
+        });
+
+        it("it should calculate the next timeblock", async () => {
+            const next = await db.calculateNextTimeBlock({ time });
+            expect(next).toBeDefined();
+            expect(next.getMinutes()).toEqual(time.getMinutes() +  1);
+        });
+
+        it("it should return the processed timeblock", () => {
+            let params = {
+                time
+            };
+            return db.getScheduleStatus(params).then(res => {
+                expect(res).toBeDefined();
+                // console.log(util.inspect(res, { showHidden: false, depth: null, colors: true }));
+                expect(res).toContainEqual(expect.objectContaining({
+                    timeblock: db.calculateTimeBlock({ time }),
+                    runner: expect.any(String),
+                    fetched: expect.any(Object),
+                    confirmed: expect.any(Object)
+                }));
             });
         });
 

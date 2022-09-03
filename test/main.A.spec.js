@@ -2,18 +2,16 @@
 
 const { ServiceBroker } = require("moleculer");
 const { AclMiddleware } = require("imicros-acl");
-const { Factory, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
+const { Context, DeploymentManager, Factory, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
 
 // helper & mocks
 const { ACL, meta, user } = require("./helper/acl");
-const { Parser } = require("../lib/parser/basic");
 const { DB } = require("../lib/db/cassandra");
 const { Keys } = require("./helper/keys");
 const { Agents } = require("./helper/agents");
 const { credentials } = require("./helper/credentials");
 const Constants = require("../lib/util/constants");
 const fs = require("fs");
-const { v4: uuid } = require("uuid");
 const util = require("util");
 const { Collect, clear } = require("./helper/collect");
 
@@ -65,36 +63,32 @@ describe("Test Process A", () => {
             await db.connect();
             expect(db).toBeDefined();
             expect(db instanceof DB).toEqual(true);
+            Context.set({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
         });
 
         it("it should instantiate a factory object", async () => {
-            factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
+            //factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
+            factory = Factory;
             expect(factory).toBeDefined();
             // expect(calls["flow.instance.created"]).toHaveLength(1);
         });
 
 
-        it("it should parse and deploy the process", async () => {
-            const parser = new Parser({broker});
-            let id = uuid();
-            let objectName = "Process Example";
-            let ownerId = credentials.ownerId;
-            parsedData = parser.parse({id, xmlData, objectName, ownerId});
-            expect(parsedData).toBeDefined();
-            expect(parsedData.process.id).toEqual(id);
-            expect(parsedData.process.name).toEqual(objectName);
-            console.log(util.inspect(parsedData, { showHidden: false, depth: null, colors: true }));
+        it("it should deploy the process", async () => {
             let params = {
-                opts: meta,
-                xmlData,
-                parsedData
+                meta,
+                objectName: "Process Example",
+                xmlData
             };
-            return db.saveProcess(params).then(res => {
+            const result = await DeploymentManager.deployProcess(params);
+            return DeploymentManager.getProcess({ processId: result.processId, versionId: result.versionId, meta }).then(res => {
                 expect(res).toBeDefined();
-                expect(res).toEqual({
-                    processId: parsedData.process.id,
-                    versionId: parsedData.version.id
-                });
+                expect(res.parsedData).toBeDefined();
+                parsedData = res.parsedData;
+                console.log(util.inspect(parsedData, { showHidden: false, depth: null, colors: true }));
+                expect(parsedData).toBeDefined();
+                expect(parsedData.process.id).toBeDefined();
+                expect(parsedData.process.name).toEqual(params.objectName);
             });
         });
 
@@ -199,7 +193,7 @@ describe("Test Process A", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -220,7 +214,7 @@ describe("Test Process A", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -241,7 +235,7 @@ describe("Test Process A", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -262,7 +256,7 @@ describe("Test Process A", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -283,7 +277,7 @@ describe("Test Process A", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -304,7 +298,7 @@ describe("Test Process A", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -325,7 +319,7 @@ describe("Test Process A", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -346,7 +340,7 @@ describe("Test Process A", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -367,7 +361,7 @@ describe("Test Process A", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });
@@ -388,7 +382,7 @@ describe("Test Process A", () => {
                 user: meta.user,
                 ownerId: meta.acl.ownerId,
                 attributes: {
-                    lastElementId: expect.any(String)
+                    lastToken: expect.any(Object)
                 }
             }));
         });

@@ -24,6 +24,8 @@ const Agents = {
                 if (!ownerId) throw new Error("not authorized");
                 if (!serviceToken) throw new Error("service not authorized");
                 if (serviceToken === credentials.serviceToken && ( ownerId === credentials.ownerId || ownerId === credentials.adminGroupId ) ) return { token: credentials.accessToken };
+                console.log(serviceToken, credentials.serviceToken);
+                console.log(ownerId, credentials.ownerId);
                 throw new Error("failed to retrieve access token");
             }
         }
