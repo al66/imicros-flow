@@ -3,26 +3,75 @@
 //import { createMachine, interpret } from 'xstate';
 const { createMachine, interpret } = require('xstate');
 
-// Stateless machine definition
-// machine.transition(...) is a pure function used by the interpreter.
-const toggleMachine = createMachine({
-  id: 'toggle',
-  initial: 'inactive',
-  predictableActionArguments: true,
-  states: {
-    inactive: { on: { TOGGLE: 'active' } },
-    active: { on: { TOGGLE: 'inactive' } }
+class Instance {
+  constructor() {
+
+    // Stateless machine definition
+    this.instanceMachine = createMachine({
+      id: 'my unqiue id',
+      initial: 'created',
+      context: {},
+      predictableActionArguments: true,
+      states: {
+        created: { on: { START: 'running' } },
+        running: { on: { STOP: { 
+          target: 'persisting',
+          actions: [
+            (context, event) => console.log("Action", event, context)
+          ] 
+        }}},
+        persisting: { on: { SAVED: 'persistent' }},
+        persistent: { on: { START: 'loading' } },
+        loading: { on: { LOADED: 'running' }}
+      },
+      on: {
+        TOKEN: { 
+          actions: [
+            (context, event) => console.log("Action", event, context)
+          ] 
+        }
+      }
+    });
+
+    // Machine instance with internal state
+    this.instanceService = interpret(this.instanceMachine)
+      .onTransition((state) => console.log("Transition",state.value))
+      .onStop((event) => console.log("Event",event))
+      .start();
   }
-});
 
-// Machine instance with internal state
-const toggleService = interpret(toggleMachine)
-  .onTransition((state) => console.log(state.value))
-  .start();
-// => 'inactive'
+  start() {
+    this.instanceService.send('START');
+    // => 'loading'
+    this.instanceService.send('LOADED');
+    // => 'running'
+  }
 
-toggleService.send('TOGGLE');
-// => 'active'
+  processToken({ token }) {
+    this.instanceService.send({ type: 'TOKEN', token });
+  }
+  
+  async stop() {
+    this.instanceService.send({ type: 'STOP', test: 'A' });
 
-toggleService.send('TOGGLE');
-// => 'inactive'
+    this.instanceService.send('SAVED');
+    // => 'persistent'
+  }
+}
+
+const instance = new Instance();
+// => 'created'
+
+instance.start()
+// => 'running'
+
+instance.stop()
+// => 'persisting'
+
+instance.start();
+// => 'loading'
+
+instance.processToken({ token: { test: 'B' }});
+// => 'running'
+
+

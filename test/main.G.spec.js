@@ -2,7 +2,7 @@
 
 const { ServiceBroker } = require("moleculer");
 const { AclMiddleware } = require("imicros-acl");
-const {Context, DeploymentManager, Factory, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
+const {Context, DeploymentManager, Instance, ServiceAPI, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
 
 // helper & mocks
 const { ACL, meta, user } = require("./helper/acl");
@@ -46,7 +46,7 @@ const xmlData = fs.readFileSync("assets/Process G.bpmn");
 
 describe("Test Process G", () => {
 
-    let broker, db, factory, parsedData, element, instanceId, token, tokenB;
+    let broker, db, parsedData, element, instanceId, token, tokenB;
 
     beforeEach(() => {
         clear(calls);
@@ -68,10 +68,17 @@ describe("Test Process G", () => {
             broker.createService(Queue);
             broker.createService(Keys);
             broker.createService(CollectEvents);
+            db = new DB({broker, options: settings.db, services});
+            await db.connect();
+            expect(db).toBeDefined();
+            expect(db instanceof DB).toEqual(true);
+            Context.set({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
             await broker.start();
+            await broker.waitForServices([{ name: "keys", version: 1},{ name:"agents" }]);
             expect(broker).toBeDefined();
         });
 
+        /*
         it("it should instantiate db", async () => {
             db = new DB({broker, options: settings.db, services});
             await db.connect();
@@ -79,14 +86,7 @@ describe("Test Process G", () => {
             expect(db instanceof DB).toEqual(true);
             Context.set({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
         });
-
-        it("it should instantiate a factory object", async () => {
-            // factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
-            factory = Factory;
-            expect(factory).toBeDefined();
-            // expect(calls["flow.instance.created"]).toHaveLength(1);
-        });
-
+        */
 
         it("it should parse and deploy the process", async () => {
             const parser = new Parser({broker});
@@ -130,7 +130,7 @@ describe("Test Process G", () => {
 
         it("it should schedule a new instance token", async () => {
             const result = await db.readScheduledToken({ time: new Date("2022-08-28T09:00:00Z") });
-            console.log(result);
+            // console.log(result);
             expect(result).toContainEqual(expect.objectContaining({
                 id: expect.any(String),
                 time: new Date("2022-08-28T09:00:00Z"),
@@ -151,7 +151,7 @@ describe("Test Process G", () => {
 
         it("it should prepare the event", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -174,7 +174,7 @@ describe("Test Process G", () => {
 
         it("it should process the event", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -195,7 +195,7 @@ describe("Test Process G", () => {
 
         it("it should schedule a new instance token", async () => {
             const result = await db.readScheduledToken({ time: new Date("2022-08-29T09:00:00Z") });
-            console.log(result);
+            // console.log(result);
             expect(result).toContainEqual(expect.objectContaining({
                 id: expect.any(String),
                 time: new Date("2022-08-29T09:00:00Z"),
@@ -210,7 +210,7 @@ describe("Test Process G", () => {
 
         it("it should activate the sequence to the task", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;

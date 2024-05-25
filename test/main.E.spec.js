@@ -2,7 +2,7 @@
 
 const { ServiceBroker } = require("moleculer");
 const { AclMiddleware } = require("imicros-acl");
-const { Context, DeploymentManager, Factory, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
+const { Context, DeploymentManager, Instance, ServiceAPI, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
 
 // helper & mocks
 const { ACL, meta, user } = require("./helper/acl");
@@ -46,7 +46,7 @@ const xmlData = fs.readFileSync("assets/Process E.bpmn");
 
 describe("Test Process E", () => {
 
-    let broker, db, factory, parsedData, element, instanceId, token;
+    let broker, db, parsedData, element, instanceId, token;
 
     beforeEach(() => {
         clear(calls);
@@ -68,10 +68,16 @@ describe("Test Process E", () => {
             broker.createService(Queue);
             broker.createService(Keys);
             broker.createService(CollectEvents);
+            db = new DB({broker, options: settings.db, services});
+            await db.connect();
+            expect(db).toBeDefined();
+            expect(db instanceof DB).toEqual(true);
+            Context.set({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
             await broker.start();
             expect(broker).toBeDefined();
         });
 
+        /*
         it("it should instantiate db", async () => {
             db = new DB({broker, options: settings.db, services});
             await db.connect();
@@ -79,14 +85,7 @@ describe("Test Process E", () => {
             expect(db instanceof DB).toEqual(true);
             Context.set({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
         });
-
-        it("it should instantiate a factory object", async () => {
-            // factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
-            factory = Factory;
-            expect(factory).toBeDefined();
-            // expect(calls["flow.instance.created"]).toHaveLength(1);
-        });
-
+        */
 
         it("it should parse and deploy the process", async () => {
             const parser = new Parser({broker});
@@ -139,7 +138,7 @@ describe("Test Process E", () => {
                 status: 30
             }
             // call
-            await factory.raiseEvent ({ eventName, payload, meta } )
+            await ServiceAPI.raiseEvent ({ eventName, payload, meta } )
             // check
             expect(calls["flow.instance.created"]).toHaveLength(1);
             instanceId = calls["flow.instance.created"][0].payload.instanceId;
@@ -162,7 +161,7 @@ describe("Test Process E", () => {
 
         it("it should prepare the event", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -181,7 +180,7 @@ describe("Test Process E", () => {
 
         it("it should process the event", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -200,7 +199,7 @@ describe("Test Process E", () => {
 
         it("it should activate the sequence to the gateway", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -221,7 +220,7 @@ describe("Test Process E", () => {
 
         it("it should process the sequence to the gateway", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -242,7 +241,7 @@ describe("Test Process E", () => {
 
         it("it should activate the gateway", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -263,7 +262,7 @@ describe("Test Process E", () => {
 
         it("it should process the gateway", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -284,7 +283,7 @@ describe("Test Process E", () => {
 
         it("it should activate the sequence to task 'Do something'", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -305,7 +304,7 @@ describe("Test Process E", () => {
 
         it("it should process the sequence to task 'Do something'", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -326,7 +325,7 @@ describe("Test Process E", () => {
 
         it("it should activate task 'Do something'", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -347,7 +346,7 @@ describe("Test Process E", () => {
 
         it("it should prepare task 'Do something'", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -368,7 +367,7 @@ describe("Test Process E", () => {
 
         it("it should process task 'Do something'", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -389,7 +388,7 @@ describe("Test Process E", () => {
 
         it("it should activate the sequence to the second gateway", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -410,7 +409,7 @@ describe("Test Process E", () => {
 
         it("it should process the sequence to the second gateway", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -431,7 +430,7 @@ describe("Test Process E", () => {
 
         it("it should activate the second gateway", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -452,7 +451,7 @@ describe("Test Process E", () => {
 
         it("it should process the second gateway", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -473,7 +472,7 @@ describe("Test Process E", () => {
 
         it("it should activate the sequence to the end event", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -494,7 +493,7 @@ describe("Test Process E", () => {
 
         it("it should process the sequence to the end event", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -515,7 +514,7 @@ describe("Test Process E", () => {
 
         it("it should activate the end event", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -536,7 +535,7 @@ describe("Test Process E", () => {
 
         it("it should prepare the end event", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -557,7 +556,7 @@ describe("Test Process E", () => {
 
         it("it should throw the end event", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             expect(calls["flow.token.emit"]).toHaveLength(1);
             token = calls["flow.token.emit"][0].payload.token;
@@ -578,7 +577,7 @@ describe("Test Process E", () => {
 
         it("it should terminate the instance", async () => {
             // call
-            await factory.processToken({ token });
+            await Instance.processToken({ token });
             // check
             const info = await db.getToken ({ opts: meta, instanceId: token.instanceId });
             expect(info.instanceId).toEqual(instanceId);

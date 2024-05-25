@@ -4,7 +4,8 @@ const { ServiceBroker } = require("moleculer");
 const { AclMiddleware } = require("imicros-acl");
 const { Stream } = require("../index");
 
-const {Factory, DeploymentManager } = require("../lib/process/main");
+const {ServiceAPI, Context, DeploymentManager } = require("../lib/process/main");
+const { DB } = require("../lib/db/cassandra");
 
 // helper & mocks
 const { ACL, meta, user } = require("./helper/acl");
@@ -86,7 +87,7 @@ describe("Test Process F", () => {
                 orderNumber: '123456'
             }
             // call
-            const result = await Factory.raiseEvent ({ eventName, payload, meta } )
+            const result = await ServiceAPI.raiseEvent ({ eventName, payload, meta } )
             expect(result).toBeDefined();
             // console.log(result);
             // check
@@ -96,7 +97,7 @@ describe("Test Process F", () => {
         });
 
         it("should complete the instance", async () => {
-            // wait 1000 ms to give enough time complete the process
+            // wait 1000 ms to give enough time to complete the process
             await new Promise(resolve => setTimeout(resolve, 1000));
             expect(calls["flow.instance.completed"]).toHaveLength(1);
             expect(calls["flow.instance.completed"][0].payload).toEqual(expect.objectContaining({

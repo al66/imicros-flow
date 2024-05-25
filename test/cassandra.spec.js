@@ -461,6 +461,44 @@ describe("Test database connection", () => {
             });
         });
 
+        it("it should add a context object", () => {
+            let params = {
+                opts,
+                instanceId: instance,
+                context: {
+                    "another one": {
+                        any: "12345"
+                    },
+                    "one more": {
+                        any: "54321"
+                    }
+                }
+            };
+            return db.updateContext(params).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toEqual(true);
+            });
+        });
+
+        it("it should read two keys from context", () => {
+            let params = {
+                opts,
+                instanceId: instance,
+                keys: ["another one","one more"]
+            };
+            return db.getContextKeys(params).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toEqual({
+                    "another one": {
+                        any: "12345"
+                    },
+                    "one more": {
+                        any: "54321"
+                    }
+                });
+            });
+        });
+
         it("it should emit a token", () => {
             let params = {
                 opts,

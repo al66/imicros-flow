@@ -4,6 +4,7 @@ const Collect = {
     name: "helper.collect",
     events: {
         "**"(payload, sender, event, ctx) {
+            this.broker.logger.info("Event", event);
             // console.log("called", {payload, sender, event, ctx});
             this.calls[event] ? this.calls[event].push({payload, sender, event, ctx}) : this.calls[event] = [{payload, sender, event, ctx}];
         }

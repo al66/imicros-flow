@@ -2,7 +2,7 @@
 
 const { ServiceBroker } = require("moleculer");
 const { AclMiddleware } = require("imicros-acl");
-const { Context, Factory, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
+const { Context, Factory, Instance, Activity, Sequence, Gateway, Event } = require("../lib/process/main");
 
 // helper & mocks
 const { ACL, meta, user } = require("./helper/acl");
@@ -36,7 +36,7 @@ const xmlData = fs.readFileSync("assets/Process Example.bpmn");
 
 describe("Test flow service", () => {
 
-    let broker, db, factory, parsedData, element;
+    let broker, db, parsedData, element;
 
     describe("Test start broker and connect to db", () => {
 
@@ -49,16 +49,25 @@ describe("Test flow service", () => {
             broker.createService(ACL);
             broker.createService(Agents);
             broker.createService(Keys);
+            db = new DB({broker, options: settings.db, services});
+            await db.connect();
+            Context.set({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
+            expect(db).toBeDefined();
+            expect(db instanceof DB).toEqual(true);
             await broker.start();
+            await broker.waitForServices([{ name: "keys", version: 1},{ name:"agents" }]);
             expect(broker).toBeDefined();
         });
 
+        /*
         it("it should instantiate db", async () => {
             db = new DB({broker, options: settings.db, services});
             await db.connect();
+            Context.set({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
             expect(db).toBeDefined();
             expect(db instanceof DB).toEqual(true);
         });
+        */
 
         it("it should parse and deploy the process", async () => {
             const parser = new Parser({broker});
@@ -86,14 +95,7 @@ describe("Test flow service", () => {
 
     });
 
-    describe("Test factory class", () => {
-
-        it("it should instantiate a factory object", async () => {
-            // factory = new Factory({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
-            Context.set({ broker, db, services, serviceId: credentials.serviceId, serviceToken: credentials.serviceToken });
-            factory = Factory;
-            expect(factory).toBeDefined();
-        });
+    describe("Test Instance class", () => {
 
         it("it should instantiate an element of the process", async () => {
             const token = {
@@ -107,7 +109,8 @@ describe("Test flow service", () => {
                 ownerId: credentials.ownerId,
                 attributes: {}
             };
-            element = await factory.getElement({ token });
+            const instance = await Instance.getInstance({ token });
+            element = await instance.getElement({ token });
             expect(element).toBeDefined();
             expect(element instanceof Activity).toEqual(true);
 
@@ -150,13 +153,10 @@ describe("Test flow service", () => {
             };
             await db.addContextKey ({ opts: meta, instanceId: token.instanceId, key: "creditData", value: { "riskClass": "A" } });
             // standard call
-            element = await factory.getElement({ token });
-            let result = await element.processToken({ token });
+            let result = await Instance.processToken({ token });
             // check
             expect(result).toEqual(true);
             let log = await db.getToken ({ opts: meta , instanceId: token.instanceId });
-            expect(element).toBeDefined();
-            expect(element instanceof Activity).toEqual(true);
             expect(log.active).toContainEqual(expect.objectContaining({elementId: token.elementId, status: Constants.ACTIVITY_READY }));
         });
 
@@ -173,8 +173,7 @@ describe("Test flow service", () => {
                 attributes: {}
             };
             // standard call
-            element = await factory.getElement({ token });
-            let result = await element.processToken({ token });
+            let result = await Instance.processToken({ token });
             // check
             expect(result).toEqual(true);
             let next = await db.getNext ({ opts: meta , processId: token.processId, versionId: token.versionId, elementId: token.elementId });

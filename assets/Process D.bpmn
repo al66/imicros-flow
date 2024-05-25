@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:flow="http://www.imicros.de/schema/bpmn/flow" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_108xu2f" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="9.3.1">
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:flow="http://www.imicros.de/schema/bpmn/flow" id="Definitions_108xu2f" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0">
   <bpmn:process id="Process_0sb9pcq" isExecutable="false">
     <bpmn:startEvent id="StartEvent_0xfjovz" name="Order placed">
       <bpmn:extensionElements>
@@ -20,11 +20,12 @@
 
 
 
+
 {
     "order": order,
     "result": result
     "status": "finished"
-}                                        </flow:preparation>
+}                                                  </flow:preparation>
           <flow:context io="out" key="finished" />
         </flow:endEvent>
       </bpmn:extensionElements>
@@ -37,13 +38,17 @@
           <flow:preparation>
             <flow:context io="in" key="order" />
 
+
 {
     "number": order.orderNumber,
     "status": "new"
-}                    </flow:preparation>
+}                              </flow:preparation>
           <flow:context io="in" key="param" />
           <flow:context io="out" key="result" />
         </flow:serviceTask>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="Input_072c92i">${}</camunda:inputParameter>
+        </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0niz9n0</bpmn:incoming>
       <bpmn:outgoing>Flow_1t7kw54</bpmn:outgoing>
@@ -52,27 +57,27 @@
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0sb9pcq">
       <bpmndi:BPMNEdge id="Flow_1t7kw54_di" bpmnElement="Flow_1t7kw54">
-        <di:waypoint x="410" y="160" />
-        <di:waypoint x="462" y="160" />
+        <di:waypoint x="360" y="160" />
+        <di:waypoint x="412" y="160" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0niz9n0_di" bpmnElement="Flow_0niz9n0">
-        <di:waypoint x="258" y="160" />
-        <di:waypoint x="310" y="160" />
+        <di:waypoint x="208" y="160" />
+        <di:waypoint x="260" y="160" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_0xfjovz">
-        <dc:Bounds x="222" y="142" width="36" height="36" />
+        <dc:Bounds x="172" y="142" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="208" y="185" width="64" height="14" />
+          <dc:Bounds x="158" y="185" width="64" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1h7cvft_di" bpmnElement="Event_1h7cvft">
-        <dc:Bounds x="462" y="142" width="36" height="36" />
+        <dc:Bounds x="412" y="142" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="460" y="185" width="41" height="14" />
+          <dc:Bounds x="410" y="185" width="42" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0zy81t2_di" bpmnElement="Activity_0i02vff">
-        <dc:Bounds x="310" y="120" width="100" height="80" />
+        <dc:Bounds x="260" y="120" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
